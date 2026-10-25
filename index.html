@@ -244,9 +244,9 @@ body.editor-on .landing{display:none}
         <h2 id="ld-new-h">Start a new zine</h2>
         <label class="field">Paper size
           <select id="ld-size">
-            <option value="A3">A3 · 297 × 420 mm</option>
+            <option value="Letter" selected>Letter · 8.5 × 11 in</option>
             <option value="Legal">Legal · 8.5 × 14 in</option>
-            <option value="Letter">Letter · 8.5 × 11 in</option>
+            <option value="A3">A3 · 297 × 420 mm</option>
             <option value="A4">A4 · 210 × 297 mm</option>
             <option value="Tabloid">Tabloid · 11 × 17 in</option>
           </select>
@@ -584,7 +584,7 @@ function fontCss(key,px){var f=FONTS[key]||FONTS.sans;return f.weight+' '+px+'px
 var SWATCHES=['#ffffff','#111111','#e03131','#f76707','#fcc419','#f06595','#9c36b5','#7048e8','#1c7ed6','#22b8cf','#37b24d','#a9e34b'];
 
 function blankPanel(){return {bg:'#ffffff',pattern:'none',pc:'#111111',ps:8,photo:null,fit:'cover',zoom:1,fx:50,fy:50,border:null,bw:false,vig:0,vc:'#000000',text:'',font:'sans',size:14,color:'#111111',align:'left',valign:'top',rot:0,shadow:false,flip:false,exp:0}}
-function defSheet(){return {size:'A3',orient:'portrait',cw:300,ch:400,cols:3,rows:6,margin:6,border:4,duplex:false,flip:'long',dir:'rows',autoflip:true}}
+function defSheet(){return {size:'Letter',orient:'portrait',cw:300,ch:400,cols:3,rows:6,margin:6,border:4,duplex:false,flip:'long',dir:'rows',autoflip:true}}
 
 var S={sheet:defSheet(),panels:[]};
 var images={};            // id -> {name,src,w,h,sample}
