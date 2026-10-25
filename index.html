@@ -404,10 +404,11 @@ body.editor-on .landing{display:none}
             <div class="range"><label for="p-fx">Left / right</label><input id="p-fx" type="range" min="0" max="100" step="1" data-prop="fx" data-num="1"><output data-for="fx"></output></div>
             <div class="range"><label for="p-fy">Up / down</label><input id="p-fy" type="range" min="0" max="100" step="1" data-prop="fy" data-num="1"><output data-for="fy"></output></div>
             <div class="range"><label for="p-border">Border</label><input id="p-border" type="range" min="0" max="20" step="0.5" data-prop="border" data-num="1"><output data-for="border"></output></div>
+            <div class="range"><label for="p-exp">Exposure</label><input id="p-exp" type="range" min="-1.5" max="1.5" step="0.1" data-prop="exp" data-num="1"><output data-for="exp"></output></div>
             <label class="check"><input type="checkbox" id="p-bw" data-prop="bw">Black and white</label>
             <div class="range"><label for="p-vig">Vignette</label><input id="p-vig" type="range" min="0" max="100" step="1" data-prop="vig" data-num="1"><output data-for="vig"></output></div>
             <div class="row">Vignette color <div class="sw" data-sw="vc"></div></div>
-            <div class="btnrow"><button class="btn small" id="ph-remove" type="button">Remove photo</button><button class="btn small" id="vigAll" type="button">Use this vignette on all photos</button></div>
+            <div class="btnrow"><button class="btn small" id="ph-remove" type="button">Remove photo</button><button class="btn small" id="vigAll" type="button">Use this vignette on all photos</button><button class="btn small" id="expAll" type="button">Use this exposure on all photos</button></div>
           </div>
         </section>
         <section class="group" aria-label="Background">
@@ -582,7 +583,7 @@ var FONTS={
 function fontCss(key,px){var f=FONTS[key]||FONTS.sans;return f.weight+' '+px+'px '+f.family+', '+f.fb}
 var SWATCHES=['#ffffff','#111111','#e03131','#f76707','#fcc419','#f06595','#9c36b5','#7048e8','#1c7ed6','#22b8cf','#37b24d','#a9e34b'];
 
-function blankPanel(){return {bg:'#ffffff',pattern:'none',pc:'#111111',ps:8,photo:null,fit:'cover',zoom:1,fx:50,fy:50,border:null,bw:false,vig:0,vc:'#000000',text:'',font:'sans',size:14,color:'#111111',align:'left',valign:'top',rot:0,shadow:false,flip:false}}
+function blankPanel(){return {bg:'#ffffff',pattern:'none',pc:'#111111',ps:8,photo:null,fit:'cover',zoom:1,fx:50,fy:50,border:null,bw:false,vig:0,vc:'#000000',text:'',font:'sans',size:14,color:'#111111',align:'left',valign:'top',rot:0,shadow:false,flip:false,exp:0}}
 function defSheet(){return {size:'A3',orient:'portrait',cw:300,ch:400,cols:3,rows:6,margin:6,border:4,duplex:false,flip:'long',dir:'rows',autoflip:true}}
 
 var S={sheet:defSheet(),panels:[]};
@@ -657,7 +658,7 @@ function drawPanel(ctx,p,R,sc){var x=R.x*sc,y=R.y*sc,w=R.w*sc,h=R.h*sc;ctx.save(
   ctx.fillStyle=p.bg;ctx.fillRect(x,y,w,h);if(p.pattern&&p.pattern!=='none')drawPattern(ctx,p,x,y,w,h,sc);
   var im=p.photo&&IMG.get(p.photo);
   if(im&&im.complete&&im.naturalWidth){var b=bOf(p)*sc,ix=x+b,iy=y+b,iw=w-2*b,ih=h-2*b;
-    if(iw>2&&ih>2){ctx.save();ctx.beginPath();ctx.rect(ix,iy,iw,ih);ctx.clip();if(p.bw)ctx.filter='grayscale(1)';var nw=im.naturalWidth,nh=im.naturalHeight,s;
+    if(iw>2&&ih>2){ctx.save();ctx.beginPath();ctx.rect(ix,iy,iw,ih);ctx.clip();var flt=[];if(+p.exp)flt.push('brightness('+Math.pow(2,+p.exp).toFixed(3)+')');if(p.bw)flt.push('grayscale(1)');if(flt.length)ctx.filter=flt.join(' ');var nw=im.naturalWidth,nh=im.naturalHeight,s;
       if(p.fit==='contain'){s=Math.min(iw/nw,ih/nh)*p.zoom;var dw=nw*s,dh=nh*s;ctx.drawImage(im,ix+(iw-dw)*p.fx/100,iy+(ih-dh)*p.fy/100,dw,dh)}
       else{s=Math.max(iw/nw,ih/nh)*p.zoom;var sw=iw/s,sh=ih/s;ctx.drawImage(im,(nw-sw)*p.fx/100,(nh-sh)*p.fy/100,sw,sh,ix,iy,iw,ih)}
       ctx.filter='none';
@@ -749,7 +750,7 @@ function buildSwatches(){$$('[data-sw]').forEach(function(box){var prop=box.data
   list.forEach(function(c){h+='<button type="button" data-for="'+prop+'" data-color="'+c+'" style="background:'+c+'" aria-label="Color '+c+'" aria-pressed="false"></button>'});
   h+='<input type="color" data-prop="'+prop+'" id="c-'+prop+'" aria-label="Custom color">';box.innerHTML=h});
   var fs=$('#p-font');Object.keys(FONTS).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=FONTS[k].label;fs.appendChild(o)})}
-function outText(k,v){if(k==='zoom')return (+v).toFixed(2)+'×';if(k==='fx'||k==='fy'||k==='vig')return Math.round(v)+'%';if(k==='border'||k==='ps')return fmt(v)+' mm';if(k==='size')return v+' pt';return v}
+function outText(k,v){if(k==='exp'){v=+v||0;return (v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+' EV'}if(k==='zoom')return (+v).toFixed(2)+'×';if(k==='fx'||k==='fy'||k==='vig')return Math.round(v)+'%';if(k==='border'||k==='ps')return fmt(v)+' mm';if(k==='size')return v+' pt';return v}
 function fillInspector(){var g=geo(),p=A()[selected];if(!p)return;var nums=pageNumbers(g),n=S.panels.length,num=nums[selected],b=bOf(p),sd=duplex()?side:'front';
   $('#ins-page').textContent=(sd==='back'?num+' (back)':num)+' of '+n;$('#ins-role').textContent=roleOf(selected,g,sd);
   var aw=g.pw-2*b,ah=g.ph-2*b;$('#ins-size').textContent='Page '+fmt(g.pw)+' × '+fmt(g.ph)+' mm · photo area '+fmt(Math.max(0,aw))+' × '+fmt(Math.max(0,ah))+' mm · 300 dpi needs '+Math.round(aw/25.4*300)+' × '+Math.round(ah/25.4*300)+' px';
@@ -804,6 +805,7 @@ insp.addEventListener('change',function(e){if(e.target.closest('[data-prop]')){c
 insp.addEventListener('click',function(e){var bt=e.target.closest('.sw button');if(!bt)return;var p=A()[selected];p[bt.dataset.for]=bt.dataset.color;fillInspector();draw();commit()});
 $('#ph-remove').addEventListener('click',function(){A()[selected].photo=null;commit();renderAll()});
 $('#clearPage').addEventListener('click',function(){A()[selected]=blankPanel();commit();renderAll();toast('Page cleared. Undo brings it back.')});
+$('#expAll').addEventListener('click',function(){var s=A()[selected],n=0;bothSides(function(a){a.forEach(function(p){if(p.photo){p.exp=+s.exp||0;n++}})});commit();draw();toast('Exposure '+outText('exp',s.exp)+' applied to '+n+' photo'+(n===1?'':'s')+'.')});
 $('#vigAll').addEventListener('click',function(){var s=A()[selected],n=0;bothSides(function(a){a.forEach(function(p){if(p.photo){p.vig=s.vig;p.vc=s.vc;n++}})});commit();draw();toast('Vignette applied to '+n+' photo'+(n===1?'':'s')+'.')});
 $('#bgEmpty').addEventListener('click',function(){var s=A()[selected],n=0;A().forEach(function(p,i){if(i!==selected&&!p.photo&&!String(p.text).trim()){p.bg=s.bg;p.pattern=s.pattern;p.pc=s.pc;p.ps=s.ps;n++}});commit();draw();toast('Background used on '+n+' page'+(n===1?'':'s')+'.')});
 
