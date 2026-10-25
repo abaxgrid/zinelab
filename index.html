@@ -469,7 +469,7 @@ body.editor-on .landing{display:none}
       </select>
     </label>
     <label class="check"><input type="checkbox" id="e-cuts" checked>Cut lines</label>
-    <label class="check"><input type="checkbox" id="e-ticks" checked>Fold and trim marks in the margin</label>
+    <label class="check"><input type="checkbox" id="e-ticks" checked>Fold, trim and centre marks in the margin</label>
     <label class="check"><input type="checkbox" id="e-folds">Dashed fold lines across the pages</label>
     <label class="check"><input type="checkbox" id="e-guide" checked>Add a page with cutting and folding instructions</label>
     <label class="check"><input type="checkbox" id="e-test">Test sheet: page numbers only</label>
@@ -965,7 +965,7 @@ function pdfMarks(doc,g,sd,ox,oy){ox=ox||0;oy=oy||0;function ln(a,b,c,d){doc.lin
       if(f.turn){if(f.end==='top')ln(f.x1,m-1-L,f.x1,m-1);else if(f.end==='bottom')ln(f.x1,H-m+1,f.x1,H-m+1+L);else if(f.end==='left')ln(m-1-L,f.y1,m-1,f.y1);else ln(W-m+1,f.y1,W-m+1+L,f.y1);return}
       if(f.dir==='h'){var k='h'+fmt(f.y1);if(seen[k])return;seen[k]=1;ln(m-1-L,f.y1,m-1,f.y1);ln(W-m+1,f.y1,W-m+1+L,f.y1)}
       else{var k2='v'+fmt(f.x1);if(seen[k2])return;seen[k2]=1;ln(f.x1,m-1-L,f.x1,m-1);ln(f.x1,H-m+1,f.x1,H-m+1+L)}})}
-  if(duplex()&&g.m>=3){doc.setDrawColor(40);doc.setLineWidth(0.15);var cr=Math.min(1.4,g.m/2-0.4);[[g.W/2,g.m/2],[g.W/2,g.H-g.m/2],[g.m/2,g.H/2],[g.W-g.m/2,g.H/2]].forEach(function(c){doc.circle(c[0]+ox,c[1]+oy,cr,'S');ln(c[0]-cr-0.8,c[1],c[0]+cr+0.8,c[1]);ln(c[0],c[1]-cr-0.8,c[0],c[1]+cr+0.8)})}
+  if($('#e-ticks').checked&&g.m>=3){doc.setDrawColor(40);doc.setLineWidth(0.15);var cr=Math.min(1.4,g.m/2-0.4);[[g.W/2,g.m/2],[g.W/2,g.H-g.m/2],[g.m/2,g.H/2],[g.W-g.m/2,g.H/2]].forEach(function(c){doc.circle(c[0]+ox,c[1]+oy,cr,'S');ln(c[0]-cr-0.8,c[1],c[0]+cr+0.8,c[1]);ln(c[0],c[1]-cr-0.8,c[0],c[1]+cr+0.8)})}
   if($('#e-folds').checked){doc.setDrawColor(190);doc.setLineWidth(0.15);doc.setLineDashPattern([1.5,1.5],0);sideLines(folds,g,sd).forEach(function(f){ln(f.x1,f.y1,f.x2,f.y2)});doc.setLineDashPattern([],0)}
   if($('#e-cuts').checked&&sd!=='back'){doc.setDrawColor(60);doc.setLineWidth(0.2);cuts(g).forEach(function(l){ln(l.x1,l.y1,l.x2,l.y2)})}}
 function guidePage(doc,g){var pad=Math.max(10,Math.min(16,g.W*0.05)),n=g.cols*g.rows,small=g.W<230;doc.setTextColor(20,32,26);
