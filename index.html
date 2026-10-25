@@ -120,6 +120,38 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:0}
 .modal .card{width:min(460px,100%);max-height:100%;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.35)}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:6px;font-size:13px;z-index:50;max-width:calc(100% - 32px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .modal .card.guide-card{width:min(760px,100%)}
+/* Start page: shown until a zine is opened; the editor (header + workbench) shows only with body.editor-on. */
+body:not(.editor-on) .app>.top,body:not(.editor-on) .work{display:none}
+body.editor-on .landing{display:none}
+.landing{display:flex;flex-direction:column;gap:18px}
+.ld-hero{background-color:var(--mat);background-image:linear-gradient(var(--mat-line-strong) 1px,transparent 1px),linear-gradient(90deg,var(--mat-line-strong) 1px,transparent 1px),linear-gradient(var(--mat-line) 1px,transparent 1px),linear-gradient(90deg,var(--mat-line) 1px,transparent 1px);background-size:100px 100px,100px 100px,20px 20px,20px 20px;border-radius:12px;padding:clamp(20px,4vw,44px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:24px;align-items:center;color:var(--on-mat)}
+@media (max-width:820px){.ld-hero{grid-template-columns:minmax(0,1fr)}}
+.ld-eyebrow{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+.ld-title{font-family:var(--display);font-weight:800;font-size:clamp(38px,6.4vw,72px);line-height:.95;letter-spacing:-.035em;margin:8px 0 14px;text-wrap:balance;color:var(--on-mat)}
+.ld-lede{margin:0;font-size:clamp(15px,1.6vw,17.5px);line-height:1.55;max-width:56ch}
+.ld-facts{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.ld-facts li{font-size:12.5px;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:4px 10px}
+.ld-art svg{width:100%;height:auto;max-width:440px;display:block;margin:0 auto;filter:drop-shadow(0 10px 18px rgba(0,0,0,.3))}
+.ld-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:820px){.ld-grid{grid-template-columns:minmax(0,1fr)}}
+.ld-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.ld-layouts{border:0;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ld-layouts legend{font-size:12px;color:var(--muted);margin-bottom:4px;padding:0}
+@media (max-width:460px){.ld-layouts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ld-layouts input{position:absolute;opacity:0;width:1px;height:1px}
+.ld-layouts label{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:8px;padding:10px;cursor:pointer;background:var(--surface-2)}
+.ld-layouts label b{font-family:var(--display);font-size:22px;line-height:1}
+.ld-layouts label span{font-size:11.5px;color:var(--muted)}
+.ld-layouts input:checked+label{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--surface)}
+.ld-layouts input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
+.ld-how{display:flex;flex-direction:column;gap:12px;padding-block:6px}
+.ld-steps{list-style:none;counter-reset:st;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.ld-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.ld-steps{grid-template-columns:minmax(0,1fr)}}
+.ld-steps li{counter-increment:st;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.ld-steps li::before{content:counter(st);font-family:var(--mono);font-size:12px;color:var(--accent)}
+.ld-steps b{font-family:var(--display);font-size:16px}
+.ld-steps span{font-size:13px;color:var(--muted);line-height:1.5}
 .projinfo{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;min-width:0;max-width:240px}
 .projname{font-weight:600;font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .modal .card.proj-card{width:min(640px,100%)}
@@ -166,12 +198,91 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:0}
 </style>
 
 <div class="app">
+  <section class="landing" id="landing" aria-labelledby="ld-h">
+    <div class="ld-hero">
+      <div class="ld-copy">
+        <p class="ld-eyebrow">Skylux Photo Studio</p>
+        <h1 id="ld-h" class="ld-title">Skylux Zine Lab</h1>
+        <p class="ld-lede">Turn one printed sheet into a small zig-zag photo zine. Lay out your photos here, print the sheet, crease it, cut a few slits, and it folds into a little book where every page leads into the next.</p>
+        <ul class="ld-facts"><li>A3, Legal, Letter and more</li><li>8 to 24 pages, on one or both sides</li><li>Print-ready PDF with cut and fold guides</li></ul>
+      </div>
+      <div class="ld-art" aria-hidden="true">
+        <svg viewBox="0 0 380 250" role="presentation">
+          <g transform="translate(18 16)">
+            <rect width="150" height="212" fill="#ffffff"/>
+            <g>
+              <rect x="6" y="6" width="42" height="27" fill="#e03131"/><rect x="56" y="6" width="38" height="27" fill="#22b8cf"/><rect x="102" y="6" width="42" height="27" fill="#fcc419"/>
+              <rect x="6" y="41" width="42" height="27" fill="#f06595"/><rect x="56" y="41" width="38" height="27" fill="#7048e8"/><rect x="102" y="41" width="42" height="27" fill="#37b24d"/>
+              <rect x="6" y="76" width="42" height="27" fill="#1c7ed6"/><rect x="56" y="76" width="38" height="27" fill="#f76707"/><rect x="102" y="76" width="42" height="27" fill="#f06595"/>
+              <rect x="6" y="111" width="42" height="27" fill="#fcc419"/><rect x="56" y="111" width="38" height="27" fill="#e03131"/><rect x="102" y="111" width="42" height="27" fill="#22b8cf"/>
+              <rect x="6" y="146" width="42" height="27" fill="#37b24d"/><rect x="56" y="146" width="38" height="27" fill="#fcc419"/><rect x="102" y="146" width="42" height="27" fill="#7048e8"/>
+              <rect x="6" y="181" width="42" height="25" fill="#7048e8"/><rect x="56" y="181" width="38" height="25" fill="#1c7ed6"/><rect x="102" y="181" width="42" height="25" fill="#f76707"/>
+            </g>
+            <g stroke="#7cc0ff" stroke-width="1.4" stroke-dasharray="4 3"><line x1="0" y1="37" x2="150" y2="37"/><line x1="0" y1="72" x2="150" y2="72"/><line x1="0" y1="107" x2="150" y2="107"/><line x1="0" y1="142" x2="150" y2="142"/><line x1="0" y1="177" x2="150" y2="177"/></g>
+            <g stroke="#ff4f8b" stroke-width="2.6"><line x1="52" y1="0" x2="52" y2="177"/><line x1="98" y1="37" x2="98" y2="212"/></g>
+          </g>
+          <g fill="none" stroke="#eaf5f0" stroke-width="2" stroke-linecap="round"><path d="M190 122 h44"/><path d="M226 114 l9 8 -9 8"/></g>
+          <g transform="translate(258 70)">
+            <rect x="14" y="24" width="86" height="58" fill="#f76707"/><rect x="10" y="18" width="86" height="58" fill="#7048e8"/><rect x="6" y="12" width="86" height="58" fill="#22b8cf"/><rect x="2" y="6" width="86" height="58" fill="#fcc419"/>
+            <rect x="-2" y="0" width="86" height="58" fill="#e03131"/>
+            <text x="6" y="48" font-family="Anton, Impact, sans-serif" font-size="17" fill="#fcc419">ZINE</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="ld-grid">
+      <section class="card ld-start" aria-labelledby="ld-new-h">
+        <h2 id="ld-new-h">Start a new zine</h2>
+        <label class="field">Paper size
+          <select id="ld-size">
+            <option value="A3">A3 · 297 × 420 mm</option>
+            <option value="Legal">Legal · 8.5 × 14 in</option>
+            <option value="Letter">Letter · 8.5 × 11 in</option>
+            <option value="A4">A4 · 210 × 297 mm</option>
+            <option value="Tabloid">Tabloid · 11 × 17 in</option>
+          </select>
+        </label>
+        <fieldset class="ld-layouts"><legend>Pages</legend>
+          <input type="radio" name="ld-layout" id="ly-8" value="2x4"><label for="ly-8"><b>8</b><span>2 strips × 4</span></label>
+          <input type="radio" name="ld-layout" id="ly-12" value="3x4"><label for="ly-12"><b>12</b><span>3 strips × 4</span></label>
+          <input type="radio" name="ld-layout" id="ly-18" value="3x6" checked><label for="ly-18"><b>18</b><span>3 strips × 6</span></label>
+          <input type="radio" name="ld-layout" id="ly-24" value="4x6"><label for="ly-24"><b>24</b><span>4 strips × 6</span></label>
+        </fieldset>
+        <label class="check"><input type="checkbox" id="ld-duplex">Print on both sides (needs double-sided paper)</label>
+        <p class="hint" id="ld-msg" aria-live="polite">You can change all of this later in the editor.</p>
+        <div class="btnrow"><button class="btn primary" id="ld-new" type="button">Start laying out</button></div>
+      </section>
+      <div class="ld-side">
+        <section class="card" id="ld-continue" hidden aria-labelledby="ld-cont-h">
+          <h2 id="ld-cont-h">Continue where you left off</h2>
+          <p class="hint" id="ld-cont-info"></p>
+          <div class="btnrow"><button class="btn primary" id="ld-cont" type="button">Continue</button></div>
+        </section>
+        <section class="card" aria-labelledby="ld-open-h">
+          <h2 id="ld-open-h">Open a project</h2>
+          <p class="hint" id="ld-open-note">Open a project file you downloaded earlier.</p>
+          <div class="btnrow"><button class="btn" id="ld-projects" type="button" hidden>Your saved projects</button><label class="btn" for="openFile">Open a file</label></div>
+        </section>
+      </div>
+    </div>
+    <section class="ld-how" aria-labelledby="ld-how-h">
+      <h2 id="ld-how-h">How it works</h2>
+      <ol class="ld-steps">
+        <li><b>Lay out</b><span>Pick the paper and the number of pages, add your JPG photos and drag them into reading order. Add text, colors, patterns and vignettes.</span></li>
+        <li><b>Preview</b><span>Flip through the zine on screen as spreads or single pages to check the sequence.</span></li>
+        <li><b>Print</b><span>Export the PDF and print it at 100%. Print a test sheet on plain paper first to check the folds.</span></li>
+        <li><b>Fold and cut</b><span>Crease the rows across the whole sheet, cut the slits, then refold page by page. The PDF includes the steps.</span></li>
+      </ol>
+      <p class="hint">Photos stay private: they are kept in your browser and, when you save a project here, in your own claude.ai storage. RAW files need exporting to JPG first.</p>
+    </section>
+  </section>
   <header class="top">
     <div class="brand">
       <h1>Skylux Zine Lab</h1>
       <p>Lay out one sheet, print it single-sided, cut the slits and fold it into a zig-zag zine.</p>
     </div>
     <div class="actions">
+      <button class="btn small ghost" id="homeBtn" type="button" title="Back to the start page">Home</button>
       <span class="projinfo"><span class="projname" id="projName">Untitled project</span><span class="status" id="saveStatus" aria-live="polite"></span></span>
       <button class="btn small ghost" id="undo" type="button" title="Undo (Ctrl+Z)">Undo</button>
       <button class="btn small ghost" id="redo" type="button" title="Redo (Ctrl+Shift+Z)">Redo</button>
@@ -227,12 +338,10 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:0}
       <section class="card" aria-labelledby="photos-h">
         <h2 id="photos-h">Photos</h2>
         <label class="drop" id="dropzone"><strong>Add photos</strong>Drop JPG or PNG exports here, or click to choose. RAW files won't open in a browser.<input id="file" type="file" accept="image/jpeg,image/png,image/webp" multiple></label>
-        <div class="banner" id="sampleBanner" hidden>The sheet opens with sample graphics. Add your photos, then remove the samples.</div>
         <div class="tray" id="tray" aria-label="Photo tray"></div>
         <p class="hint" id="trayHint">Drag a photo onto a page. On a phone, tap a photo, then tap a page.</p>
         <div class="btnrow">
           <button class="btn small" id="fillEmpty" type="button">Fill empty pages in order</button>
-          <button class="btn small" id="removeSamples" type="button">Remove samples</button>
           <button class="btn small" id="clearAll" type="button">Clear all pages</button>
         </div>
       </section>
@@ -555,26 +664,8 @@ function usedPages(){var g=geo(),nums=pageNumbers(g),u={};S.panels.forEach(funct
   if(duplex())backArr().forEach(function(p,i){if(p.photo){(u[p.photo]=u[p.photo]||[]).push(nums[i]+'b')}});return u}
 function bothSides(fn){fn(S.panels);if(S.back)fn(S.back)}
 
-/* ---------- samples ---------- */
-function sampleImages(){var P=[['#ffffff','#e03131','#fcc419'],['#fff3bf','#f06595','#22b8cf'],['#e9ecef','#7048e8','#fcc419'],['#ffffff','#37b24d','#f76707'],['#d0ebff','#1c7ed6','#fcc419'],['#ffe066','#f76707','#7048e8']],out=[];
-  for(var i=0;i<12;i++){var W=900,H=600,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d'),bg=P[i%6][0],a=P[i%6][1],b=P[i%6][2],k=i%4,r,q;x.fillStyle=bg;x.fillRect(0,0,W,H);
-    if(k===0){for(r=0;r<5;r++)for(q=0;q<8;q++){var X=30+q*110,Y=30+r*112;x.fillStyle=a;x.fillRect(X,Y,80,70);x.fillStyle=b;x.fillRect(X+8,Y+10,64,22)}}
-    else if(k===1){x.save();x.translate(W/2,H/2);x.rotate(-0.5);for(var t=-900,n=0;t<900;t+=90,n++){x.fillStyle=n%2===0?a:b;x.fillRect(t,-700,45,1400)}x.restore()}
-    else if(k===2){x.fillStyle=a;x.beginPath();x.moveTo(0,H);x.lineTo(W*0.62,0);x.lineTo(W,0);x.lineTo(W,H);x.closePath();x.fill();x.fillStyle='#1b1b1b';for(r=0;r<3;r++){x.beginPath();x.arc(180+r*40,140+r*150,36,0,7);x.fill();x.beginPath();x.arc(620+r*50,120+r*150,36,0,7);x.fill()}}
-    else{for(r=0;r<9;r++)for(q=-1;q<9;q++){var X2=q*110+(r%2?55:0),Y2=r*68;x.fillStyle=a;x.fillRect(X2+4,Y2+4,100,58);x.fillStyle=b;x.fillRect(X2+12,Y2+40,84,14)}}
-    out.push({name:'Sample '+(i+1),src:c.toDataURL('image/jpeg',0.86),w:W,h:H,sample:true})}return out}
-function sampleProject(){images={};IMG.clear();S.sheet=defSheet();var g0=geo(),blank=[];for(var b=0;b<g0.cols*g0.rows;b++)blank.push(blankPanel());S.panels=blank;S.back=null;side='front';selected=0}
-function sampleProjectWithGraphics(){images={};IMG.clear();S.sheet=defSheet();var ids=sampleImages().map(function(m){var id=uid();addImage(id,m);return id});
-  var g=geo(),p=path(g),panels=[];for(var i=0;i<g.cols*g.rows;i++)panels.push(blankPanel());
-  function at(k){return panels[p[k]]}
-  Object.assign(at(0),{bg:'#e03131',text:'EL VALLE\nDE ANTÓN',font:'anton',size:34,color:'#fcc419',valign:'bottom'});
-  for(var k=1;k<=12;k++)at(k).photo=ids[k-1];
-  at(5).vig=45;at(9).bw=true;
-  Object.assign(at(13),{bg:'#f06595',text:'A one-day trip. Cycling roads, the Sunday market, the crater rim. One sheet, cut and folded into a maze zine.',font:'mono',size:8,color:'#ffffff',valign:'middle'});
-  Object.assign(at(14),{bg:'#fff3bf',pattern:'checker',pc:'#22b8cf',ps:9});
-  Object.assign(at(15),{bg:'#7048e8',pattern:'dots',pc:'#f06595',ps:7});
-  Object.assign(at(17),{bg:'#f76707',text:'Photographs\nEl Valle de Antón, Panamá\n2026',font:'sans',size:10,color:'#ffffff',valign:'bottom'});
-  S.panels=panels;S.back=null;side='front';selected=0}
+/* ---------- new sheet ---------- */
+function blankProject(){images={};IMG.clear();S.sheet=defSheet();var g0=geo(),blank=[];for(var b=0;b<g0.cols*g0.rows;b++)blank.push(blankPanel());S.panels=blank;S.back=null;side='front';selected=0}
 
 /* ---------- inspector and sheet UI ---------- */
 function buildSwatches(){$$('[data-sw]').forEach(function(box){var prop=box.dataset.sw,h='';var list=prop==='vc'?['#000000','#ffffff','#3b2a1a']:SWATCHES;
@@ -597,7 +688,7 @@ function syncSheetUI(){var s=S.sheet;$('#s-size').value=s.size;$('#customFields'
   $('#s-duplex').checked=!!s.duplex;$('#duplexFields').hidden=!s.duplex;$('#fl-l').checked=s.flip!=='short';$('#fl-s').checked=s.flip==='short'}
 function renderTray(){var u=usedPages(),ids=Object.keys(images),h='';
   ids.forEach(function(id){var m=images[id],used=u[id];h+='<div class="tray-item"><button type="button" class="thumb'+(armed===id?' armed':'')+'" draggable="true" data-id="'+id+'" title="'+esc(m.name)+'" aria-pressed="'+(armed===id)+'"><img src="'+m.src+'" alt="'+esc(m.name)+'">'+(used?'<span class="used">p.'+used.join(',')+'</span>':'')+'</button><button type="button" class="del" data-del="'+id+'" aria-label="Remove '+esc(m.name)+' from the tray">×</button></div>'});
-  $('#tray').innerHTML=h||'<p class="hint">No photos yet.</p>';var hasSamples=ids.some(function(id){return images[id].sample});$('#sampleBanner').hidden=!hasSamples;$('#removeSamples').hidden=!hasSamples;
+  $('#tray').innerHTML=h||'<p class="hint">No photos yet.</p>';
   $('#trayHint').textContent=armed?'Now tap a page on the sheet to place '+images[armed].name+'.':'Drag a photo onto a page. On a phone, tap a photo, then tap a page.'}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function renderAll(){fillInspector();renderTray();draw()}
@@ -646,7 +737,6 @@ tray.addEventListener('dragstart',function(e){var t=e.target.closest('.thumb');i
 $('#fillEmpty').addEventListener('click',function(){var g=geo(),u=usedPages(),pool=Object.keys(images).filter(function(id){return !u[id]}),n=0;
   if(!pool.length){toast('Every photo in the tray is already on the sheet.');return}
   path(g).forEach(function(i){if(pool.length&&isEmpty(A()[i])){A()[i].photo=pool.shift();n++}});commit();renderAll();toast(n?'Placed '+n+' photo'+(n===1?'':'s')+' in page order.':'No empty pages left. Clear a page first.')});
-$('#removeSamples').addEventListener('click',function(){var n=0;Object.keys(images).forEach(function(id){if(images[id].sample){bothSides(function(a){a.forEach(function(p){if(p.photo===id)p.photo=null})});delete images[id];IMG.delete(id);n++}});commit();renderAll();scheduleSave();toast('Removed '+n+' sample'+(n===1?'':'s')+'.')});
 $('#clearAll').addEventListener('click',function(){if(duplex()&&side==='back')S.back=S.panels.map(blankPanel);else S.panels=S.panels.map(blankPanel);commit();renderAll();toast('All pages cleared. Undo brings them back.')});
 
 /* ---------- events: canvas ---------- */
@@ -677,7 +767,7 @@ function saveFile(name,data){if(!(window.claude&&typeof window.claude.use==='fun
 function saveErr(e){var c=e&&e.code;if(c==='declined')return 'Download cancelled.';if(c==='too_large')return 'The file is too large here. Try a lower resolution.';if(c==='rate_limited')return 'A save prompt is already open. Finish that one first.';
   return 'Saving files is not available in this view. Open the page in claude.ai to download.'}
 $('#openFile').addEventListener('change',function(e){var f=e.target.files[0];e.target.value='';if(!f)return;var r=new FileReader();r.onload=function(){try{var o=JSON.parse(r.result);if(!o||!o.sheet||!Array.isArray(o.panels))throw 0;
-    loadProject(o,{id:null,name:String(f.name).replace(/\.json$/i,'').replace(/^skylux-zine-project$/,'')});closeProj();toast('Opened '+f.name+'. Save it to keep it in your projects.')}catch(_){toast('That file is not a Skylux Zine Lab project.')}};r.readAsText(f)});
+    loadProject(o,{id:null,name:String(f.name).replace(/\.json$/i,'').replace(/^skylux-zine-project$/,'')});closeProj();showEditor();toast('Opened '+f.name+'. Save it to keep it in your projects.')}catch(_){toast('That file is not a Skylux Zine Lab project.')}};r.readAsText(f)});
 function loadProject(o,meta){loading=true;images={};IMG.clear();Object.keys(o.images||{}).forEach(function(id){var m=o.images[id];if(!m)return;m=Object.assign({},m);if(!m.src&&m.asset)m.src='/_blob/'+m.asset;if(m.src)addImage(id,m)});
   S.sheet=Object.assign(defSheet(),o.sheet);var n=S.sheet.cols*S.sheet.rows;S.panels=[];for(var i=0;i<n;i++)S.panels.push(Object.assign(blankPanel(),o.panels[i]||{}));
   S.back=Array.isArray(o.back)?S.panels.map(function(_,j){return Object.assign(blankPanel(),o.back[j]||{})}):null;side='front';
@@ -717,7 +807,7 @@ function saveCloud(asNew){if(!cloudOK()){openProj();return Promise.resolve(false
   return uploadMissing().then(function(){return col().doc(current.id).set(cloudDoc())}).then(function(){dirty=false;setStatus('Saved '+nowShort());idbSet('project',projectObj());return true})
   .catch(function(e){setStatus(cloudErr(e));return false}).then(function(ok){cloudBusy=false;if(cloudAgain){cloudAgain=false;if(dirty)scheduleCloud()}return ok})}
 function scheduleCloud(){if(!current.id||!cloudOK())return;setStatus('Unsaved changes');clearTimeout(cloudTimer);cloudTimer=setTimeout(function(){saveCloud(false)},4000)}
-function hasWork(){return Object.keys(images).some(function(id){return !images[id].sample})||S.panels.some(function(p){return String(p.text||'').trim()&&!/^EL VALLE/.test(p.text)})}
+function hasWork(){return Object.keys(images).length>0||S.panels.some(function(p){return !isEmpty(p)})||(!!S.back&&S.back.some(function(p){return !isEmpty(p)}))}
 function needGuard(){return dirty&&!current.id&&hasWork()}
 function loadList(){var box=$('#pj-list');if(!cloudOK()){box.innerHTML='<p class="hint">No saved projects here.</p>';return Promise.resolve()}
   box.innerHTML='<p class="hint">Loading your projects…</p>';
@@ -740,7 +830,7 @@ $('#pj-save').addEventListener('click',function(){doSave(false)});$('#pj-saveas'
 $('#pj-name').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doSave(false)}});
 $('#pj-list').addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!b)return;var row=b.closest('[data-pid]'),pid=row.dataset.pid,x=pjCache.filter(function(p){return p.id===pid})[0];if(!x)return;
   if(b.dataset.act==='open'){if(needGuard()&&b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Open anyway';$('#pj-msg').textContent='The current sheet has not been saved. Opening another project replaces it.';return}
-    loadProject(x.o,{id:x.id,name:x.o.name||''});setStatus('Opened');closeProj();toast('Opened “'+(x.o.name||'Untitled project')+'”.')}
+    loadProject(x.o,{id:x.id,name:x.o.name||''});setStatus('Opened');closeProj();showEditor();toast('Opened “'+(x.o.name||'Untitled project')+'”.')}
   else if(b.dataset.act==='del'){if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Confirm delete';return}
     b.disabled=true;col().doc(pid).delete().then(function(){pjCache=pjCache.filter(function(p){return p.id!==pid});
       var keep={};pjCache.forEach(function(p){var im=p.o.images||{};Object.keys(im).forEach(function(k){if(im[k].asset)keep[im[k].asset]=1})});
@@ -750,7 +840,7 @@ $('#pj-list').addEventListener('click',function(e){var b=e.target.closest('[data
       return gone.reduce(function(pr,a){return pr.then(function(){return CLOUD.assets.delete(a).catch(function(){})})},Promise.resolve())})
     .then(function(){renderList();$('#pj-msg').textContent='Deleted “'+(x.o.name||'Untitled project')+'”.'}).catch(function(){b.disabled=false;$('#pj-msg').textContent='Could not delete it. Try again.'})}});
 $('#pj-new').addEventListener('click',function(e){var b=e.currentTarget;if(needGuard()&&b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Start new anyway';$('#pj-msg').textContent='The current sheet has not been saved. Starting a new project clears it.';return}
-  b.dataset.armed='';b.textContent='Start a new project';var sheet=Object.assign({},S.sheet);loadProject({sheet:sheet,panels:[],images:{}},{id:null,name:''});closeProj();toast('New project. Add photos to start.')});
+  b.dataset.armed='';b.textContent='Start a new project';var sheet=Object.assign({},S.sheet);loadProject({sheet:sheet,panels:[],images:{}},{id:null,name:''});closeProj();showEditor();toast('New project. Add photos to start.')});
 $('#pj-download').addEventListener('click',function(){var ids=Object.keys(images),out={};$('#pj-msg').textContent='Preparing the file…';
   ids.reduce(function(pr,id){return pr.then(function(){return imageToDataURL(id).then(function(src){var m=images[id];out[id]={name:m.name,w:m.w,h:m.h,src:src,sample:!!m.sample}})})},Promise.resolve())
   .then(function(){var s=JSON.stringify({app:'maze-zine-maker',v:1,sheet:S.sheet,panels:S.panels,back:S.back||null,images:out});var fn=(current.name||'skylux-zine-project').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'skylux-zine-project';
@@ -843,7 +933,9 @@ function tokLabel(t){return 'p.'+tokPage(t)+(t[0]==='B'?' back':'')}
 function renderPages(){var g=geo(),order=path(g),n=order.length,two=duplex(),fold=$('#vw-fold').checked&&!two,dpr=Math.min(2,window.devicePixelRatio||1),targetH=Math.min(1100,Math.max(320,window.innerHeight*0.72*dpr)),sc=targetH/g.ph,k;
   $('#vw-fold').closest('label').hidden=two;VW.imgs={};
   function rend(num,sd){var i=order[num-1],R=rectOf(i,g),c=document.createElement('canvas');c.width=Math.round(g.pw*sc);c.height=Math.round(g.ph*sc);var x=c.getContext('2d');
-    if(fold&&R.c%2===1){x.translate(c.width,c.height);x.rotate(Math.PI)}x.translate(-R.x*sc,-R.y*sc);drawPanel(x,sd==='B'?backArr()[i]:S.panels[i],R,sc);VW.imgs[sd+num]=c.toDataURL('image/jpeg',0.9)}
+    if(fold&&R.c%2===1){x.translate(c.width,c.height);x.rotate(Math.PI)}x.translate(-R.x*sc,-R.y*sc);var pp=sd==='B'?backArr()[i]:S.panels[i];drawPanel(x,pp,R,sc);
+    if(isEmpty(pp)){var cw=R.w*sc,ch=R.h*sc,big=Math.min(ch*0.42,cw*0.36);x.textAlign='center';x.textBaseline='middle';x.fillStyle='rgba(20,32,26,.16)';x.font='700 '+big+'px "Bricolage Grotesque", Arial, sans-serif';x.fillText(num+(sd==='B'?'b':''),R.x*sc+cw/2,R.y*sc+ch*0.5)}
+    VW.imgs[sd+num]=c.toDataURL('image/jpeg',0.9)}
   for(k=1;k<=n;k++){rend(k,'F');if(two)rend(k,'B')}
   VW.spreads=[[null,'F1']];
   if(!two){for(k=2;k<=n;k+=2)VW.spreads.push(['F'+k,k+1<=n?'F'+(k+1):null])}
@@ -883,12 +975,28 @@ stage.addEventListener('pointerup',function(e){if(!sw)return;var dx=e.clientX-sw
   if(Math.abs(dx)<8&&Math.abs(dy)<8){var r=stage.getBoundingClientRect();vwFlip(e.clientX>r.left+r.width/2?1:-1)}});
 window.addEventListener('resize',function(){if(!$('#viewer').hidden)vwLayout()});
 
+/* ---------- start page ---------- */
+function showEditor(){document.body.classList.add('editor-on');window.scrollTo(0,0);requestAnimationFrame(function(){draw()})}
+function showLanding(){document.body.classList.remove('editor-on');refreshLanding();window.scrollTo(0,0)}
+function placedCount(){var n=0;bothSides(function(a){a.forEach(function(p){if(p.photo)n++})});return n}
+function refreshLanding(){var has=hasWork();$('#ld-continue').hidden=!has;
+  if(has){var g=geo(),pc=placedCount();$('#ld-cont-info').textContent=(current.name||'Untitled zine')+' · '+sizeLabel()+' · '+(g.cols*g.rows)+' pages'+(duplex()?', both sides':'')+' · '+pc+' photo'+(pc===1?'':'s')+' placed · '+(current.id?'saved to your projects':'draft in this browser')}
+  var b=$('#ld-new');b.dataset.armed='';b.textContent='Start laying out';$('#ld-msg').textContent='You can change all of this later in the editor.';
+  cloudReady.then(function(){var ok=cloudOK();$('#ld-projects').hidden=!ok;$('#ld-open-note').textContent=ok?'Open a zine you saved to your projects, or a project file you downloaded.':'Open a project file you downloaded earlier.'})}
+$('#ld-new').addEventListener('click',function(e){var b=e.currentTarget;
+  if(hasWork()&&!current.id&&b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Start anyway';$('#ld-msg').textContent='Your current draft is not saved to your projects. Starting a new zine replaces it.';return}
+  var lay=($('input[name=ld-layout]:checked')||{value:'3x6'}).value.split('x'),sheet=Object.assign(defSheet(),{size:$('#ld-size').value,cols:+lay[0],rows:+lay[1],duplex:$('#ld-duplex').checked});
+  loadProject({sheet:sheet,panels:[],images:{}},{id:null,name:''});showEditor();toast('New '+(+lay[0]*+lay[1])+'-page zine on '+sizeLabel()+'. Add photos to start.')});
+$('#ld-cont').addEventListener('click',showEditor);
+$('#ld-projects').addEventListener('click',function(){cloudReady.then(openProj)});
+$('#homeBtn').addEventListener('click',showLanding);
+
 /* ---------- boot ---------- */
-buildSwatches();loading=true;sampleProject();syncSheetUI();commit();renderAll();updUndo();loading=false;dirty=false;updProjUI();
+buildSwatches();loading=true;blankProject();syncSheetUI();commit();renderAll();updUndo();loading=false;dirty=false;updProjUI();
 ensureFonts().then(draw);
 var ro=window.ResizeObserver?new ResizeObserver(function(){draw()}):null;if(ro)ro.observe($('#sheetwrap'));else window.addEventListener('resize',draw);
 idbGet('project').then(function(o){if(o&&o.sheet&&Array.isArray(o.panels)){var meta=o.current&&typeof o.current==='object'?o.current:{id:null,name:''};var wasDirty=!!o.dirty;
-  loadProject(o,meta);dirty=wasDirty;updProjUI();setStatus(meta.id?(wasDirty?'Unsaved changes restored':'Saved to your projects'):'Draft restored from this browser');if(meta.id&&wasDirty)cloudReady.then(function(){scheduleCloud()})}});
+  loadProject(o,meta);dirty=wasDirty;updProjUI();setStatus(meta.id?(wasDirty?'Unsaved changes restored':'Saved to your projects'):'Draft restored from this browser');if(meta.id&&wasDirty)cloudReady.then(function(){scheduleCloud()})}refreshLanding()});
 })();
 </script>
 

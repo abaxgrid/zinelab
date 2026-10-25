@@ -18,9 +18,9 @@ Everything runs in a single file, `index.html`. There is no build step and no se
 ## Use it
 
 1. Open `index.html` in a recent desktop browser (Chrome, Edge, Firefox or Safari).
-2. Pick the paper size and grid, add photos, arrange and style the pages.
+2. On the start page, pick the paper size and number of pages (or continue your draft, or open a project file), then add photos and arrange and style the pages.
 3. Check the result with **Preview zine** and **Cut and fold guide**.
-4. **Export PDF**, then print at 100% (Actual size), single-sided, with "Fit to page" turned off.
+4. **Export PDF**, then print at 100% (Actual size), with "Fit to page" turned off: single-sided, or pages 1 and 2 as one two-sided sheet.
 
 Print one copy on plain paper and fold it before printing on photo paper.
 
