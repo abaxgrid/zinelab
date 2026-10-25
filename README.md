@@ -7,7 +7,7 @@ Everything runs in a single file, `index.html`. There is no build step and no se
 ## What it does
 
 - **Sheet setup**: A3, Legal, Letter, A4, Tabloid, A2 or a custom size, portrait or landscape. Choose the number of strips (columns) and pages per strip (rows), the paper margin and the white border around photos.
-- **Photos**: drop in JPG, PNG or WebP files, drag them onto pages, drag one page onto another to swap them, or fill empty pages in reading order. Each page shows whether its photo has enough resolution to print sharply.
+- **Photos**: drop in JPG, PNG or WebP files. New photos are placed automatically on the empty pages in reading order, sorted by file name (switchable). Drag photos onto pages, drag one page onto another to swap them, or fill empty pages from the tray. Each page shows whether its photo has enough resolution to print sharply.
 - **Per-page styling**: background color, patterns (checks, stripes, dots, grid), vignette strength and color, black and white, zoom and crop position, and text with font, size, color, alignment and rotation.
 - **Cut and fold guides**: the sheet shows cut slits, valley and mountain folds, and page numbers in reading order. A guide panel lists the tools and steps for the current layout: fold the rows across the whole sheet first, then cut the slits, then refold.
 - **Two-sided printing**: optional back side for every page, laid out mirrored for long-edge or short-edge duplex printing.
