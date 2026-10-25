@@ -1,6 +1,6 @@
 # Skylux Zine Lab
 
-A browser tool for laying out a one-sheet zig-zag ("maze") zine: one printed sheet, a few slits, and accordion folds turn it into a small book.
+A browser tool for laying out photo zines in two formats: a one-sheet zig-zag ("maze") zine, where a few slits and accordion folds turn one printed sheet into a small book, or a stapled booklet, printed on both sides, folded and stapled on the spine.
 
 Everything runs in a single file, `index.html`. There is no build step and no server; open it in a browser or host it on GitHub Pages.
 
@@ -8,6 +8,7 @@ Everything runs in a single file, `index.html`. There is no build step and no se
 
 - **Sheet setup**: A3, Legal, Letter, A4, Tabloid, A2 or a custom size, portrait or landscape. Choose columns and rows, whether the zine opens side to side like a book (strips across, vertical folds) or top to bottom like a calendar (strips down, horizontal folds), the paper margin and the white border around photos.
 - **Photos**: drop in JPG, PNG or WebP files. New photos are placed automatically on the empty pages in reading order, sorted by file name (switchable). An **Auto-place photos** button fills empty pages from the tray on the front, the back, or both. Drag photos onto pages, or drag one page onto another to swap them. Each page shows whether its photo has enough resolution to print sharply.
+- **Stapled booklet**: fold sheets in half and nest them (4 to 48 pages), or fold one sheet twice into 8 small pages and trim the top open. Portrait pages with the spine on the left, or landscape pages with the spine on top. Per-page layouts: framed, full bleed, a spread across the fold, or 2 or 4 photos. The PDF puts the pages in printing order on each side, shifts inner pages toward the spine for creep (based on the paper thickness), and adds fold marks, alignment crosshairs, sheet numbers, staple marks and fold-and-staple instructions.
 - **Per-page styling**: background color, patterns (checks, stripes, dots, grid), exposure (±1.5 EV), vignette strength and color, black and white, zoom and crop position, and text with font, size, color, alignment and rotation.
 - **Captions and word pages** (inside claude.ai): Claude looks at your photos and writes captions, or suggests words and short phrases with matching colors for text pages.
 - **Cut and fold guides**: the sheet shows cut slits, valley and mountain folds, and page numbers in reading order. A guide panel lists the tools and steps for the current layout: fold the rows across the whole sheet first, then cut the slits, then refold.

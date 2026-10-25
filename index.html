@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Caveat:wght@600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
+[hidden]{display:none!important}
 /* Layout: a cutting-mat workbench. Sheet settings and the photo tray on the left, the printed sheet lying on a green mat in the middle, the selected page's settings on the right. */
 :root{
   --bg:#e8edea; --surface:#ffffff; --surface-2:#f3f6f4; --fg:#14201a; --muted:#56655e; --line:#d2dbd6;
@@ -113,6 +114,21 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:0}
 .chip.warn{color:var(--warn);border:1px solid var(--warn)}
 .group{display:flex;flex-direction:column;gap:9px;padding-top:12px;border-top:1px solid var(--line)}
 .group:first-of-type{border-top:0;padding-top:0}
+body.is-book .maze-only{display:none!important}
+body:not(.is-book) .book-only{display:none!important}
+body:not(.is-book) #bkLayout+.group{border-top:0;padding-top:0}
+.bk-cells{display:flex;flex-wrap:wrap;gap:6px}
+.bk-cell{position:relative;width:58px;height:58px;border:1px dashed var(--line);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);background:var(--surface-2)}
+.bk-cell img{width:100%;height:100%;object-fit:cover;display:block}
+.bk-cell button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:20px;padding:0;cursor:pointer}
+.ld-fmt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border:0;padding:0;margin:0}
+.ld-fmt legend{font-size:12px;color:var(--muted);margin-bottom:4px;padding:0}
+.ld-fmt input{position:absolute;opacity:0;width:1px;height:1px}
+.ld-fmt label{display:flex;flex-direction:column;gap:3px;border:1px solid var(--line);border-radius:8px;padding:10px;cursor:pointer;background:var(--surface-2)}
+.ld-fmt label b{font-size:14px}
+.ld-fmt label span{font-size:11.5px;color:var(--muted)}
+.ld-fmt input:checked+label{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--surface)}
+.ld-fmt input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
 .ins-cols{display:grid;grid-template-columns:1fr;gap:14px}
 @media (max-width:1200px) and (min-width:781px){.ins-cols{grid-template-columns:repeat(3,minmax(0,1fr))}.ins-cols .group{border-top:0;padding-top:0}}
 
@@ -212,8 +228,8 @@ body.editor-on .landing{display:none}
       <div class="ld-copy">
         <p class="ld-eyebrow">Skylux Photo Studio</p>
         <h1 id="ld-h" class="ld-title">Skylux Zine Lab</h1>
-        <p class="ld-lede">Turn one printed sheet into a small zig-zag photo zine. Lay out your photos here, print the sheet, crease it, cut a few slits, and it folds into a little book where every page leads into the next.</p>
-        <ul class="ld-facts"><li>A3, Legal, Letter and more</li><li>8 to 24 pages, on one or both sides</li><li>Print-ready PDF with cut and fold guides</li></ul>
+        <p class="ld-lede">Turn printed sheets into a small photo zine. Make a zig-zag maze zine from one sheet with a few slits and folds, or a stapled booklet from sheets printed on both sides. Lay out your photos here, print, fold, and it becomes a little book.</p>
+        <ul class="ld-facts"><li>A3, Legal, Letter and more</li><li>Maze zines of 8 to 24 pages, or stapled booklets of 4 to 48</li><li>Print-ready PDF with cut, fold and staple guides</li></ul>
       </div>
       <div class="ld-art" aria-hidden="true">
         <svg viewBox="0 0 380 250" role="presentation">
@@ -242,6 +258,10 @@ body.editor-on .landing{display:none}
     <div class="ld-grid">
       <section class="card ld-start" aria-labelledby="ld-new-h">
         <h2 id="ld-new-h">Start a new zine</h2>
+        <fieldset class="ld-fmt"><legend>Format</legend>
+          <input type="radio" name="ld-fmt" id="lf-m" value="maze" checked><label for="lf-m"><b>Maze zine</b><span>One sheet, a few slits and zig-zag folds. No staples.</span></label>
+          <input type="radio" name="ld-fmt" id="lf-b" value="booklet"><label for="lf-b"><b>Stapled booklet</b><span>Sheets printed on both sides, folded and stapled on the spine.</span></label>
+        </fieldset>
         <label class="field">Paper size
           <select id="ld-size">
             <option value="Letter" selected>Letter · 8.5 × 11 in</option>
@@ -251,6 +271,7 @@ body.editor-on .landing{display:none}
             <option value="Tabloid">Tabloid · 11 × 17 in</option>
           </select>
         </label>
+        <div class="ld-maze" style="display:flex;flex-direction:column;gap:12px">
         <fieldset class="ld-layouts"><legend>Pages</legend>
           <input type="radio" name="ld-layout" id="ly-8" value="2x4"><label for="ly-8"><b>8</b><span>2 across × 4 down</span></label>
           <input type="radio" name="ld-layout" id="ly-12" value="3x4"><label for="ly-12"><b>12</b><span>3 across × 4 down</span></label>
@@ -261,6 +282,19 @@ body.editor-on .landing{display:none}
           <div class="seg" role="radiogroup" aria-label="Zine opens"><input type="radio" name="ld-dir" id="ldd-r" value="rows" checked><label for="ldd-r">Side to side, like a book</label><input type="radio" name="ld-dir" id="ldd-c" value="cols"><label for="ldd-c">Top to bottom, like a calendar</label></div>
         </div>
         <label class="check"><input type="checkbox" id="ld-duplex">Print on both sides (needs double-sided paper)</label>
+        </div>
+        <div class="ld-book" hidden style="display:flex;flex-direction:column;gap:12px">
+          <div class="row">Folding
+            <div class="seg" role="radiogroup" aria-label="Folding"><input type="radio" name="ld-fold" id="ldf-1" value="once" checked><label for="ldf-1">Fold in half</label><input type="radio" name="ld-fold" id="ldf-2" value="twice"><label for="ldf-2">Fold twice, 8 small pages</label></div>
+          </div>
+          <label class="field" id="ld-pages-f">Pages
+            <select id="ld-pages"></select>
+          </label>
+          <div class="row">Page shape
+            <div class="seg" role="radiogroup" aria-label="Page shape"><input type="radio" name="ld-shape" id="lds-p" value="portrait" checked><label for="lds-p">Portrait, spine on the left</label><input type="radio" name="ld-shape" id="lds-l" value="landscape"><label for="lds-l">Landscape, spine on top</label></div>
+          </div>
+          <p class="hint" id="ld-bkinfo"></p>
+        </div>
         <p class="hint" id="ld-msg" aria-live="polite">You can change all of this later in the editor.</p>
         <div class="btnrow"><button class="btn primary" id="ld-new" type="button">Start laying out</button></div>
       </section>
@@ -283,7 +317,7 @@ body.editor-on .landing{display:none}
         <li><b>Lay out</b><span>Pick the paper and the number of pages, add your JPG photos and drag them into reading order. Add text, colors, patterns and vignettes.</span></li>
         <li><b>Preview</b><span>Flip through the zine on screen as spreads or single pages to check the sequence.</span></li>
         <li><b>Print</b><span>Export the PDF and print it at 100%. Print a test sheet on plain paper first to check the folds.</span></li>
-        <li><b>Fold and cut</b><span>Crease the rows across the whole sheet, cut the slits, then refold page by page. The PDF includes the steps.</span></li>
+        <li><b>Fold</b><span>Maze zine: crease the sheet, cut the slits, then refold page by page. Booklet: fold each sheet in half, nest them and staple on the fold. The PDF includes the steps.</span></li>
       </ol>
       <p class="hint">Photos stay private: they are kept in your browser and, when you save a project here, in your own claude.ai storage. RAW files need exporting to JPG first.</p>
     </section>
@@ -310,6 +344,9 @@ body.editor-on .landing{display:none}
     <div class="left">
       <section class="card" aria-labelledby="sheet-h">
         <h2 id="sheet-h">Sheet</h2>
+        <div class="row">Format
+          <div class="seg" role="radiogroup" aria-label="Format"><input type="radio" name="sfmt" id="fm-m" value="maze"><label for="fm-m">Maze zine</label><input type="radio" name="sfmt" id="fm-b" value="booklet"><label for="fm-b">Stapled booklet</label></div>
+        </div>
         <label class="field">Paper size
           <select id="s-size">
             <option value="A3">A3 · 297 × 420 mm</option>
@@ -325,6 +362,7 @@ body.editor-on .landing{display:none}
           <label class="field">Width (mm)<input id="s-cw" type="number" min="80" max="1000" step="1"></label>
           <label class="field">Height (mm)<input id="s-ch" type="number" min="80" max="1000" step="1"></label>
         </div>
+        <div class="maze-only" style="display:flex;flex-direction:column;gap:8px">
         <div class="row">Orientation
           <div class="seg" role="radiogroup" aria-label="Orientation">
             <input type="radio" name="orient" id="o-p" value="portrait"><label for="o-p">Portrait</label>
@@ -339,9 +377,30 @@ body.editor-on .landing{display:none}
           <div class="seg" role="radiogroup" aria-label="Zine opens"><input type="radio" name="sdir" id="dir-r" value="rows"><label for="dir-r">Side to side</label><input type="radio" name="sdir" id="dir-c" value="cols"><label for="dir-c">Top to bottom</label></div>
         </div>
         <p class="hint" id="dirHint"></p>
+        </div>
+        <div class="book-only" style="display:flex;flex-direction:column;gap:8px">
+          <div class="row">Folding
+            <div class="seg" role="radiogroup" aria-label="Folding"><input type="radio" name="bfold" id="bf-1" value="once"><label for="bf-1">Fold in half</label><input type="radio" name="bfold" id="bf-2" value="twice"><label for="bf-2">Fold twice</label></div>
+          </div>
+          <label class="field" id="bk-pages-f">Pages
+            <select id="bk-pages"></select>
+          </label>
+          <div class="row">Page shape
+            <div class="seg" role="radiogroup" aria-label="Page shape"><input type="radio" name="bshape" id="bs-p" value="portrait"><label for="bs-p">Portrait</label><input type="radio" name="bshape" id="bs-l" value="landscape"><label for="bs-l">Landscape</label></div>
+          </div>
+          <label class="field">Paper
+            <select id="bk-paper">
+              <option value="plain">Plain or laser paper · about 0.1 mm</option>
+              <option value="thick">Heavy matte paper · about 0.18 mm</option>
+              <option value="photo">Double-sided photo paper · about 0.25 mm</option>
+            </select>
+          </label>
+          <p class="hint" id="bkHint"></p>
+        </div>
         <div class="range"><label for="s-margin">Paper margin</label><input id="s-margin" type="range" min="0" max="20" step="0.5"><output id="o-margin"></output></div>
         <div class="range"><label for="s-border">White border</label><input id="s-border" type="range" min="0" max="20" step="0.5"><output id="o-border"></output></div>
         <p class="hint">Most home printers need a margin of at least 5 mm. The white border frames each photo, like the reel.</p>
+        <div class="maze-only" style="display:flex;flex-direction:column;gap:8px">
         <label class="check"><input type="checkbox" id="s-autoflip">Turn pages so they read upright after folding</label>
         <p class="hint">Every second strip ends up upside down once folded, so those pages print turned 180° on purpose.</p>
         <label class="check"><input type="checkbox" id="s-duplex">Print on both sides</label>
@@ -355,6 +414,18 @@ body.editor-on .landing{display:none}
           </div>
           <p class="hint">Home printers often place the back 1–3 mm off. Print a test sheet, hold it against a window, and compare the small crosshairs in the margins. Looking at the back side: if its crosshair sits 2 mm to the right of the front one, enter −2 left/right; if it sits too low, enter a negative up/down value.</p>
           <p class="hint">Match your printer's two-sided setting. The back is laid out mirrored so each back page lands behind its front page. Use double-sided paper: most glossy photo paper prints on one side only.</p>
+        </div>
+        </div>
+        <div class="book-only" style="display:flex;flex-direction:column;gap:8px">
+          <div class="row">Two-sided flip
+            <div class="seg" role="radiogroup" aria-label="Two-sided flip"><input type="radio" name="bflip" id="bfl-l" value="long"><label for="bfl-l">Long edge</label><input type="radio" name="bflip" id="bfl-s" value="short"><label for="bfl-s">Short edge</label></div>
+          </div>
+          <p class="hint" id="bflipHint"></p>
+          <div class="grid2">
+            <label class="field">Shift back left / right (mm)<input id="bk-boffx" type="number" min="-10" max="10" step="0.5"></label>
+            <label class="field">Shift back up / down (mm)<input id="bk-boffy" type="number" min="-10" max="10" step="0.5"></label>
+          </div>
+          <p class="hint">Print a test sheet, hold it against a window and compare the crosshairs in the margins. Looking at the back: if its crosshair sits 2 mm to the right of the front one, enter −2 left/right.</p>
         </div>
       </section>
 
@@ -378,9 +449,10 @@ body.editor-on .landing{display:none}
     <section class="mat" aria-label="Sheet preview">
       <div class="mat-bar">
         <div class="seg sideseg" id="sideSwitch" hidden role="radiogroup" aria-label="Side to edit"><input type="radio" name="side" id="sd-f" value="front"><label for="sd-f">Front side</label><input type="radio" name="side" id="sd-b" value="back"><label for="sd-b">Back side</label></div>
-        <div class="legend"><span><i></i>Cut</span><span><i class="f"></i>Fold (V valley, M mountain)</span></div>
+        <div class="legend maze-only"><span><i></i>Cut</span><span><i class="f"></i>Fold (V valley, M mountain)</span></div>
+        <div class="legend book-only"><span>Pages in reading order, as the booklet opens</span></div>
         <div class="legend">
-          <label class="check"><input type="checkbox" id="v-guides" checked>Cut and fold lines</label>
+          <label class="check maze-only"><input type="checkbox" id="v-guides" checked>Cut and fold lines</label>
           <label class="check"><input type="checkbox" id="v-numbers" checked>Page numbers</label>
         </div>
       </div>
@@ -392,6 +464,13 @@ body.editor-on .landing{display:none}
       <div class="ins-head"><h2 id="ins-h">Page <span id="ins-page">1</span></h2><span class="tag" id="ins-role">Inside</span></div>
       <p class="hint mono" id="ins-size"></p>
       <div class="ins-cols">
+        <section class="group book-only" id="bkLayout" aria-label="Page layout">
+          <h3>Layout</h3>
+          <div class="seg" role="radiogroup" aria-label="Page layout"><input type="radio" name="blay" id="bl-f" value="frame"><label for="bl-f">Framed</label><input type="radio" name="blay" id="bl-b" value="bleed"><label for="bl-b">Full bleed</label><input type="radio" name="blay" id="bl-s" value="spread"><label for="bl-s">Spread</label><input type="radio" name="blay" id="bl-2" value="two"><label for="bl-2">2 photos</label><input type="radio" name="blay" id="bl-4" value="four"><label for="bl-4">4 photos</label></div>
+          <p class="hint" id="blayHint"></p>
+          <div class="bk-cells" id="bkCells"></div>
+          <div class="btnrow"><button class="btn small" id="layAll" type="button">Use this layout on all photo pages</button></div>
+        </section>
         <section class="group" aria-label="Photo">
           <h3>Photo</h3>
           <p class="hint" id="ph-empty">No photo on this page. Drag one from the tray, or tap a photo in the tray and then tap this page.</p>
@@ -400,9 +479,15 @@ body.editor-on .landing{display:none}
             <div class="row">Fit
               <div class="seg"><input type="radio" name="fit" id="fit-c" value="cover" data-prop="fit"><label for="fit-c">Fill page</label><input type="radio" name="fit" id="fit-w" value="contain" data-prop="fit"><label for="fit-w">Whole photo</label></div>
             </div>
-            <div class="range"><label for="p-zoom">Zoom</label><input id="p-zoom" type="range" min="1" max="3" step="0.01" data-prop="zoom" data-num="1"><output data-for="zoom"></output></div>
+            <div class="range"><label for="p-zoom">Zoom</label><input id="p-zoom" type="range" min="0.5" max="3" step="0.01" data-prop="zoom" data-num="1"><output data-for="zoom"></output></div>
+            <div class="btnrow"><button class="btn small" type="button" data-zoom="-0.1" aria-label="Zoom out 10%">− 10%</button><button class="btn small" type="button" data-zoom="0.1" aria-label="Zoom in 10%">+ 10%</button><button class="btn small" type="button" data-zoom="reset">Fit to frame</button></div>
             <div class="range"><label for="p-fx">Left / right</label><input id="p-fx" type="range" min="0" max="100" step="1" data-prop="fx" data-num="1"><output data-for="fx"></output></div>
             <div class="range"><label for="p-fy">Up / down</label><input id="p-fy" type="range" min="0" max="100" step="1" data-prop="fy" data-num="1"><output data-for="fy"></output></div>
+            <div class="row">Move photo
+              <div class="btnrow"><button class="btn small" type="button" data-nudge="x,-5" aria-label="Move photo left">←</button><button class="btn small" type="button" data-nudge="y,-5" aria-label="Move photo up">↑</button><button class="btn small" type="button" data-nudge="y,5" aria-label="Move photo down">↓</button><button class="btn small" type="button" data-nudge="x,5" aria-label="Move photo right">→</button><button class="btn small" type="button" data-nudge="center">Center</button></div>
+            </div>
+            <label class="check"><input type="checkbox" id="moveMode">Drag on the sheet to move the photo inside its frame</label>
+            <p class="hint">Or hold Alt (Option on a Mac) while dragging. Without either, dragging a page swaps it with another.</p>
             <div class="range"><label for="p-border">Border</label><input id="p-border" type="range" min="0" max="20" step="0.5" data-prop="border" data-num="1"><output data-for="border"></output></div>
             <div class="range"><label for="p-exp">Exposure</label><input id="p-exp" type="range" min="-1.5" max="1.5" step="0.1" data-prop="exp" data-num="1"><output data-for="exp"></output></div>
             <label class="check"><input type="checkbox" id="p-bw" data-prop="bw">Black and white</label>
@@ -468,10 +553,11 @@ body.editor-on .landing{display:none}
         <option value="150">150 dpi · quick proof</option>
       </select>
     </label>
-    <label class="check"><input type="checkbox" id="e-cuts" checked>Cut lines</label>
-    <label class="check"><input type="checkbox" id="e-ticks" checked>Fold, trim and centre marks in the margin</label>
-    <label class="check"><input type="checkbox" id="e-folds">Dashed fold lines across the pages</label>
-    <label class="check"><input type="checkbox" id="e-guide" checked>Add a page with cutting and folding instructions</label>
+    <label class="check maze-only"><input type="checkbox" id="e-cuts" checked>Cut lines</label>
+    <label class="check"><input type="checkbox" id="e-ticks" checked><span id="e-ticks-l">Fold, trim and centre marks in the margin</span></label>
+    <label class="check maze-only"><input type="checkbox" id="e-folds">Dashed fold lines across the pages</label>
+    <label class="check book-only"><input type="checkbox" id="e-staple" checked>Small staple marks on the spine of the outer sheet</label>
+    <label class="check"><input type="checkbox" id="e-guide" checked><span id="e-guide-l">Add a page with cutting and folding instructions</span></label>
     <label class="check"><input type="checkbox" id="e-test">Test sheet: page numbers only</label>
     <p class="hint" id="e-testhint">Prints big page numbers and a “top” arrow instead of your photos. Fold one on plain paper to check the order, which way up each page reads, and, for two-sided printing, that the back lines up with the front.</p>
     <p class="hint" id="e-printhint">Print at 100% (Actual size), single-sided. Turn off “Fit to page”.</p>
@@ -533,7 +619,7 @@ body.editor-on .landing{display:none}
     <div class="ins-head"><h2 id="gd-h">How to cut and fold</h2><button class="btn small" id="gd-close" type="button">Close</button></div>
     <p class="hint mono" id="gd-sub"></p>
     <div class="gd-diagram"><canvas id="gd-cv" aria-label="Diagram of the sheet with page numbers in reading order, cut lines and fold lines"></canvas></div>
-    <div class="legend gd-legend"><span><i></i>Cut</span><span><i class="f"></i>Fold</span><span><b>V</b> valley, folds toward you</span><span><b>M</b> mountain, folds away</span><span class="muted">Grey line: reading order</span></div>
+    <div class="legend gd-legend maze-only"><span><i></i>Cut</span><span><i class="f"></i>Fold</span><span><b>V</b> valley, folds toward you</span><span><b>M</b> mountain, folds away</span><span class="muted">Grey line: reading order</span></div>
     <div class="gd-cols">
       <div><h3>You need</h3><ul class="gd-list" id="gd-tools"></ul></div>
       <div><h3>Steps</h3><ol class="gd-list" id="gd-steps"></ol></div>
@@ -583,8 +669,8 @@ var FONTS={
 function fontCss(key,px){var f=FONTS[key]||FONTS.sans;return f.weight+' '+px+'px '+f.family+', '+f.fb}
 var SWATCHES=['#ffffff','#111111','#e03131','#f76707','#fcc419','#f06595','#9c36b5','#7048e8','#1c7ed6','#22b8cf','#37b24d','#a9e34b'];
 
-function blankPanel(){return {bg:'#ffffff',pattern:'none',pc:'#111111',ps:8,photo:null,fit:'cover',zoom:1,fx:50,fy:50,border:null,bw:false,vig:0,vc:'#000000',text:'',font:'sans',size:14,color:'#111111',align:'left',valign:'top',rot:0,shadow:false,flip:false,exp:0}}
-function defSheet(){return {size:'Letter',orient:'portrait',cw:300,ch:400,cols:3,rows:6,margin:6,border:4,duplex:false,flip:'long',dir:'rows',autoflip:true}}
+function blankPanel(){return {bg:'#ffffff',pattern:'none',pc:'#111111',ps:8,photo:null,fit:'cover',zoom:1,fx:50,fy:50,border:null,bw:false,vig:0,vc:'#000000',text:'',font:'sans',size:14,color:'#111111',align:'left',valign:'top',rot:0,shadow:false,flip:false,exp:0,layout:'frame',more:[]}}
+function defSheet(){return {size:'Letter',orient:'portrait',cw:300,ch:400,cols:3,rows:6,margin:6,border:4,duplex:false,flip:'long',dir:'rows',autoflip:true,format:'maze',bk:defBk()}}
 
 var S={sheet:defSheet(),panels:[]};
 var images={};            // id -> {name,src,w,h,sample}
@@ -596,14 +682,14 @@ var cv=$('#cv');
 /* ---------- geometry ---------- */
 function sheetDims(){var w,h,d=SIZES[S.sheet.size];if(S.sheet.size==='Custom'||!d){w=+S.sheet.cw||300;h=+S.sheet.ch||400}else{w=d[0];h=d[1]}
   var s=Math.min(w,h),l=Math.max(w,h);return S.sheet.orient==='landscape'?[l,s]:[s,l]}
-function geo(){var d=sheetDims(),W=d[0],H=d[1],m=+S.sheet.margin,cols=S.sheet.cols,rows=S.sheet.rows;return {W:W,H:H,m:m,cols:cols,rows:rows,pw:(W-2*m)/cols,ph:(H-2*m)/rows}}
+function geo(){if(isBook()){var L=boardLayout();return {W:L.W,H:L.H,m:0,cols:L.B.N,rows:1,pw:L.B.RW,ph:L.B.RH,book:true,L:L}}var d=sheetDims(),W=d[0],H=d[1],m=+S.sheet.margin,cols=S.sheet.cols,rows=S.sheet.rows;return {W:W,H:H,m:m,cols:cols,rows:rows,pw:(W-2*m)/cols,ph:(H-2*m)/rows}}
 function rectOf(i,g){var r=Math.floor(i/g.cols),c=i%g.cols;return {x:g.m+c*g.pw,y:g.m+r*g.ph,w:g.pw,h:g.ph,r:r,c:c}}
 /* Strip direction. 'cols': strips run down the sheet, folds are horizontal, the zine flips up and down like a calendar.
    'rows': strips run across the sheet, folds are vertical, the zine turns side to side like a book. */
 function byRows(){return S.sheet.dir==='rows'}
-function path(g){var out=[],k,r,c;if(byRows()){for(r=0;r<g.rows;r++)for(k=0;k<g.cols;k++){c=r%2===0?k:g.cols-1-k;out.push(r*g.cols+c)}}
+function path(g){var out=[],k,r,c;if(isBook()){for(k=0;k<nPages();k++)if(!isCovered(k))out.push(k);return out}if(byRows()){for(r=0;r<g.rows;r++)for(k=0;k<g.cols;k++){c=r%2===0?k:g.cols-1-k;out.push(r*g.cols+c)}}
   else{for(c=0;c<g.cols;c++)for(k=0;k<g.rows;k++){r=c%2===0?k:g.rows-1-k;out.push(r*g.cols+c)}}return out}
-function pageNumbers(g){var p=path(g),m=[];p.forEach(function(idx,k){m[idx]=k+1});return m}
+function pageNumbers(g){var p=path(g),m=[];if(isBook()){for(var q=0;q<nPages();q++)m[q]=q+1;return m}p.forEach(function(idx,k){m[idx]=k+1});return m}
 function cuts(g){var out=[];if(byRows()){for(var r=0;r<g.rows-1;r++){var y=g.m+(r+1)*g.ph;if(r%2===0)out.push({x1:g.m,y1:y,x2:g.m+(g.cols-1)*g.pw,y2:y});else out.push({x1:g.m+g.pw,y1:y,x2:g.W-g.m,y2:y})}return out}
   for(var c=0;c<g.cols-1;c++){var x=g.m+(c+1)*g.pw;if(c%2===0)out.push({x1:x,y1:g.m,x2:x,y2:g.m+(g.rows-1)*g.ph});else out.push({x1:x,y1:g.m+g.ph,x2:x,y2:g.H-g.m})}return out}
 /* The first fold is a mountain so page 1 stays on the outside as the cover; folds then alternate. */
@@ -615,7 +701,7 @@ function folds(g){var p=path(g),out=[];for(var k=0;k<p.length-1;k++){var a=rectO
    S.back[i] is what prints on the back of front page i. On the printed back side it sits at the mirrored
    position: flipping a portrait sheet on its long edge mirrors the columns, flipping on its short edge mirrors the rows. */
 var side='front';
-function duplex(){return !!S.sheet.duplex}
+function duplex(){return !!S.sheet.duplex&&!isBook()}
 function backArr(){if(!S.back||S.back.length!==S.panels.length){var b=S.back||[];S.back=S.panels.map(function(_,i){return b[i]||blankPanel()})}return S.back}
 function A(){return side==='back'&&duplex()?backArr():S.panels}
 function mirrorCols(){var land=S.sheet.orient==='landscape',lng=S.sheet.flip!=='short';return land?!lng:lng}
@@ -624,20 +710,20 @@ function physOf(i,g,sd){return sd==='back'?mirrorIdx(i,g):i}
 function mirrorLine(l,g){var o=Object.assign({},l),SW={left:'right',right:'left',top:'bottom',bottom:'top'};if(mirrorCols()){o.x1=g.W-l.x1;o.x2=g.W-l.x2;if(l.end==='left'||l.end==='right')o.end=SW[l.end]}else{o.y1=g.H-l.y1;o.y2=g.H-l.y2;if(l.end==='top'||l.end==='bottom')o.end=SW[l.end]}if(o.type)o.type=o.type==='M'?'V':'M';return o}
 function sideLines(fn,g,sd){var ls=fn(g);return sd==='back'?ls.map(function(l){return mirrorLine(l,g)}):ls}
 function outsideBack(g){var n=g.cols*g.rows;return {side:(n-2)%2===0?'front':'back',page:n}}
-function pageLabel(i,g,sd){var n=g.cols*g.rows,num=pageNumbers(g)[i],ob=outsideBack(g);
+function pageLabel(i,g,sd){var n=g.cols*g.rows,num=pageNumbers(g)[i],ob=outsideBack(g);if(isBook())return num===1?'1 COVER':num===n?n+' BACK':String(num);
   if(sd==='back')return 'p.'+num+' back'+(duplex()&&ob.side==='back'&&num===n?' · END':'');
   return num===1?'1 COVER':(num===n&&(!duplex()||ob.side==='front'))?n+' END':String(num)}
-function roleOf(i,g,sd){var n=g.cols*g.rows,num=pageNumbers(g)[i],ob=outsideBack(g);
+function roleOf(i,g,sd){var n=g.cols*g.rows,num=pageNumbers(g)[i],ob=outsideBack(g);if(isBook())return bookRole(i);
   if(sd!=='back'&&num===1)return 'Front cover';if(num===n&&(duplex()?ob.side===(sd==='back'?'back':'front'):sd!=='back'))return 'Back cover';return sd==='back'?'Back side':'Inside page'}
 function bOf(p){return p.border==null?+S.sheet.border:+p.border}
 /* Pages in every second strip end up upside down once the sheet is folded. With autoflip on they print turned 180°
    so they read upright in the finished zine; a page's own "flip" setting turns it once more. */
 function oddStrip(i,g){var R=rectOf(i,g);return (byRows()?R.r:R.c)%2===1}
-function printTurned(i,g,p){return (S.sheet.autoflip!==false&&oddStrip(i,g))!==!!(p&&p.flip)}
+function printTurned(i,g,p){if(isBook())return !!(p&&p.flip);return (S.sheet.autoflip!==false&&oddStrip(i,g))!==!!(p&&p.flip)}
 function withTurn(ctx,R,sc,on,fn){if(!on){fn();return}ctx.save();ctx.translate((R.x+R.w/2)*sc,(R.y+R.h/2)*sc);ctx.rotate(Math.PI);ctx.translate(-(R.x+R.w/2)*sc,-(R.y+R.h/2)*sc);fn();ctx.restore()}
 function fmt(n){return String(Math.round(n*10)/10)}
 function sizeLabel(){return S.sheet.size==='Custom'?'Custom':S.sheet.size}
-function isEmpty(p){return !p.photo&&!String(p.text||'').trim()&&p.pattern==='none'&&String(p.bg).toLowerCase()==='#ffffff'}
+function isEmpty(p){return !p.photo&&!(isBook()&&nSlots(p)>1&&(p.more||[]).some(Boolean))&&!String(p.text||'').trim()&&p.pattern==='none'&&String(p.bg).toLowerCase()==='#ffffff'}
 function hexA(hex,a){var h=String(hex).replace('#','');if(h.length===3)h=h.split('').map(function(c){return c+c}).join('');var n=parseInt(h,16)||0;return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')'}
 
 /* ---------- drawing ---------- */
@@ -656,16 +742,17 @@ function drawText(ctx,p,x,y,w,h,sc){var pad=Math.max(3,bOf(p))*sc,px=(+p.size)/7
   lines.forEach(function(ln,k){var tw=ctx.measureText(ln).width,tx=p.align==='left'?-bw/2+pad:p.align==='right'?bw/2-pad-tw:-tw/2;ctx.fillText(ln,tx,ty+k*lh+px*0.86)});ctx.restore()}
 function drawPanel(ctx,p,R,sc){var x=R.x*sc,y=R.y*sc,w=R.w*sc,h=R.h*sc;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
   ctx.fillStyle=p.bg;ctx.fillRect(x,y,w,h);if(p.pattern&&p.pattern!=='none')drawPattern(ctx,p,x,y,w,h,sc);
-  var im=p.photo&&IMG.get(p.photo);
-  if(im&&im.complete&&im.naturalWidth){var b=bOf(p)*sc,ix=x+b,iy=y+b,iw=w-2*b,ih=h-2*b;
-    if(iw>2&&ih>2){ctx.save();ctx.beginPath();ctx.rect(ix,iy,iw,ih);ctx.clip();var flt=[];if(+p.exp)flt.push('brightness('+Math.pow(2,+p.exp).toFixed(3)+')');if(p.bw)flt.push('grayscale(1)');if(flt.length)ctx.filter=flt.join(' ');var nw=im.naturalWidth,nh=im.naturalHeight,s;
-      if(p.fit==='contain'){s=Math.min(iw/nw,ih/nh)*p.zoom;var dw=nw*s,dh=nh*s;ctx.drawImage(im,ix+(iw-dw)*p.fx/100,iy+(ih-dh)*p.fy/100,dw,dh)}
-      else{s=Math.max(iw/nw,ih/nh)*p.zoom;var sw=iw/s,sh=ih/s;ctx.drawImage(im,(nw-sw)*p.fx/100,(nh-sh)*p.fy/100,sw,sh,ix,iy,iw,ih)}
-      ctx.filter='none';
-      if(+p.vig>0){var cx=ix+iw/2,cy=iy+ih/2,rr=Math.hypot(iw,ih)/2,k=p.vig/100,grd=ctx.createRadialGradient(cx,cy,rr*(0.78-0.6*k),cx,cy,rr);
-        grd.addColorStop(0,hexA(p.vc,0));grd.addColorStop(1,hexA(p.vc,Math.min(1,0.2+0.8*k)));ctx.fillStyle=grd;ctx.fillRect(ix,iy,iw,ih)}
-      ctx.restore()}}
+  var b=bOf(p)*sc;photoIn(ctx,p,p.photo,x+b,y+b,w-2*b,h-2*b,true);
   if(String(p.text||'').trim())drawText(ctx,p,x,y,w,h,sc);ctx.restore()}
+/* Draws one photo into a box (canvas units) with the page's exposure, black and white and vignette. The main photo uses the
+   page's fit, zoom and position; extra photos in a booklet grid fill their cell, centred. */
+function photoIn(ctx,p,id,ix,iy,iw,ih,main){var im=id&&IMG.get(id);if(!(im&&im.complete&&im.naturalWidth)||iw<=2||ih<=2)return false;
+  ctx.save();ctx.beginPath();ctx.rect(ix,iy,iw,ih);ctx.clip();var flt=[];if(+p.exp)flt.push('brightness('+Math.pow(2,+p.exp).toFixed(3)+')');if(p.bw)flt.push('grayscale(1)');if(flt.length)ctx.filter=flt.join(' ');
+  var nw=im.naturalWidth,nh=im.naturalHeight,fit=main?p.fit:'cover',z=main?(+p.zoom||1):1,fx=main?+p.fx:50,fy=main?+p.fy:50,s=(fit==='contain'?Math.min(iw/nw,ih/nh):Math.max(iw/nw,ih/nh))*z,dw=nw*s,dh=nh*s;
+  ctx.drawImage(im,ix+(iw-dw)*fx/100,iy+(ih-dh)*fy/100,dw,dh);ctx.filter='none';
+  if(+p.vig>0){var cx=ix+iw/2,cy=iy+ih/2,rr=Math.hypot(iw,ih)/2,k=p.vig/100,grd=ctx.createRadialGradient(cx,cy,rr*(0.78-0.6*k),cx,cy,rr);
+    grd.addColorStop(0,hexA(p.vc,0));grd.addColorStop(1,hexA(p.vc,Math.min(1,0.2+0.8*k)));ctx.fillStyle=grd;ctx.fillRect(ix,iy,iw,ih)}
+  ctx.restore();return true}
 function strokeLine(ctx,l,sc){ctx.beginPath();ctx.moveTo(l.x1*sc,l.y1*sc);ctx.lineTo(l.x2*sc,l.y2*sc);ctx.stroke()}
 function drawTestPanel(ctx,i,R,sc,g,sd){var x=R.x*sc,y=R.y*sc,w=R.w*sc,h=R.h*sc,num=pageNumbers(g)[i];ctx.save();
   ctx.strokeStyle='#a3a3a3';ctx.lineWidth=Math.max(1,0.25*sc);ctx.strokeRect(x+2,y+2,w-4,h-4);
@@ -673,7 +760,7 @@ function drawTestPanel(ctx,i,R,sc,g,sd){var x=R.x*sc,y=R.y*sc,w=R.w*sc,h=R.h*sc,
   ctx.font='600 '+Math.round(h*0.09)+'px Arial, sans-serif';ctx.fillText(sd==='back'?'BACK of page '+num:'FRONT, page '+num,x+w/2,y+h*0.84);
   ctx.beginPath();ctx.moveTo(x+w/2,y+h*0.07);ctx.lineTo(x+w/2-h*0.06,y+h*0.17);ctx.lineTo(x+w/2+h*0.06,y+h*0.17);ctx.closePath();ctx.fill();
   ctx.font='600 '+Math.round(h*0.065)+'px Arial, sans-serif';ctx.fillText('top',x+w/2,y+h*0.22);ctx.restore()}
-function drawSheet(ctx,sc,o){var g=geo(),sd=o.side||'front',arr=sd==='back'?backArr():S.panels;ctx.save();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,g.W*sc,g.H*sc);
+function drawSheet(ctx,sc,o){if(isBook()){drawBoard(ctx,sc,o);return}var g=geo(),sd=o.side||'front',arr=sd==='back'?backArr():S.panels;ctx.save();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,g.W*sc,g.H*sc);
   arr.forEach(function(p,i){var R=rectOf(physOf(i,g,sd),g);withTurn(ctx,R,sc,printTurned(i,g,p),function(){if(o.test)drawTestPanel(ctx,i,R,sc,g,sd);else drawPanel(ctx,p,R,sc)})});
   if(o.preview){
     ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(20,32,26,.28)';ctx.lineWidth=1;if(g.m>0)ctx.strokeRect(g.m*sc,g.m*sc,(g.W-2*g.m)*sc,(g.H-2*g.m)*sc);ctx.setLineDash([]);
@@ -694,17 +781,19 @@ function drawSheet(ctx,sc,o){var g=geo(),sd=o.side||'front',arr=sd==='back'?back
     var tgt=drag&&drag.active?drag.over:dropOver;if(tgt>=0){var T=rectOf(physOf(tgt,g,sd),g);ctx.fillStyle='rgba(214,51,108,.18)';ctx.fillRect(T.x*sc,T.y*sc,T.w*sc,T.h*sc);ctx.lineWidth=3;ctx.strokeStyle='#d6336c';ctx.strokeRect(T.x*sc+1.5,T.y*sc+1.5,T.w*sc-3,T.h*sc-3)}
   }
   ctx.restore()}
-function draw(){var g=geo(),wrap=$('#sheetwrap'),aw=Math.max(200,wrap.clientWidth),ah=Math.max(380,window.innerHeight*0.8),sc=Math.min(aw/g.W,ah/g.H);viewScale=sc;
+function draw(){var g=geo(),wrap=$('#sheetwrap'),aw=Math.max(200,wrap.clientWidth),ah=Math.max(380,window.innerHeight*0.8),sc=Math.min(aw/g.W,ah/g.H);
+  if(g.book)sc=Math.min(aw/g.W,Math.max(sc,window.innerHeight*0.42/g.L.SH));viewScale=sc;
   var dpr=Math.min(2,window.devicePixelRatio||1);cv.style.width=Math.floor(g.W*sc)+'px';cv.style.height=Math.floor(g.H*sc)+'px';
   var bw=Math.round(Math.floor(g.W*sc)*dpr),bh=Math.round(Math.floor(g.H*sc)*dpr);if(cv.width!==bw)cv.width=bw;if(cv.height!==bh)cv.height=bh;
   var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,bw,bh);drawSheet(ctx,sc,{preview:true,side:duplex()?side:'front'});updInfo()}
-function updInfo(){var g=geo(),n=g.cols*g.rows;$('#info').textContent=sizeLabel()+' · '+fmt(g.W)+' × '+fmt(g.H)+' mm · '+g.cols+' × '+g.rows+' = '+(duplex()?n+' pages × 2 sides':n+' pages')+' · page '+fmt(g.pw)+' × '+fmt(g.ph)+' mm'+(duplex()?' · showing the '+(side==='back'?'BACK':'front')+' side as printed':'');
+function updInfo(){var g=geo(),n=g.cols*g.rows;if(g.book){var B=g.L.B;$('#info').textContent='Stapled booklet · '+sizeLabel()+' · '+n+' pages on '+B.sheets+' sheet'+(B.sheets>1?'s':'')+', both sides · page '+fmt(B.RW)+' × '+fmt(B.RH)+' mm · spine on the '+(B.land?'top':'left');$('#sideSwitch').hidden=true;$('#placeScope').hidden=true;return}
+  $('#info').textContent=sizeLabel()+' · '+fmt(g.W)+' × '+fmt(g.H)+' mm · '+g.cols+' × '+g.rows+' = '+(duplex()?n+' pages × 2 sides':n+' pages')+' · page '+fmt(g.pw)+' × '+fmt(g.ph)+' mm'+(duplex()?' · showing the '+(side==='back'?'BACK':'front')+' side as printed':'');
   $('#sideSwitch').hidden=!duplex();$('#placeScope').hidden=!duplex();$('#sd-f').checked=side!=='back';$('#sd-b').checked=side==='back'}
 
 /* ---------- history and saving ---------- */
 var hist=[],hi=-1,saveTimer=null;
 function snap(){return JSON.stringify({sheet:S.sheet,panels:S.panels,back:S.back||null})}
-function commit(){var s=snap();if(hist[hi]===s)return;hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;updUndo();scheduleSave()}
+function commit(){normalizeBook();var s=snap();if(hist[hi]===s)return;hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;updUndo();scheduleSave()}
 function restore(s){var o=JSON.parse(s);S.sheet=o.sheet;S.panels=o.panels;S.back=o.back||null;if(selected>=S.panels.length)selected=0;if(!duplex())side='front';syncSheetUI();renderAll();scheduleSave()}
 function undo(){if(hi>0){hi--;restore(hist[hi]);updUndo()}}
 function redo(){if(hi<hist.length-1){hi++;restore(hist[hi]);updUndo()}}
@@ -726,19 +815,23 @@ function readImage(file){return new Promise(function(res,rej){var url=URL.create
 var autoPlace=true;try{autoPlace=localStorage.getItem('zl-autoplace')!=='0'}catch(_){}
 $('#autoPlace').checked=autoPlace;$('#autoPlace').addEventListener('change',function(e){autoPlace=e.target.checked;try{localStorage.setItem('zl-autoplace',autoPlace?'1':'0')}catch(_){}});
 /* Fill the current side's empty pages, in reading order, with the given photo ids. Returns the page numbers used. */
-function autoFill(ids){var g=geo(),nums=pageNumbers(g),a=A(),pool=ids.slice(),used=[];path(g).forEach(function(i){if(pool.length&&isEmpty(a[i])){a[i].photo=pool.shift();used.push(nums[i])}});return used}
+function autoFill(ids){var g=geo(),nums=pageNumbers(g),a=A(),pool=ids.slice(),used=[];path(g).forEach(function(i){if(pool.length){var k=fillFrom(a,i,pool);while(k-->0)used.push(nums[i])}});return used}
+/* Puts photos from the pool on page i if it is free: an empty page in a maze zine, or a booklet page's empty photo frames. Returns how many it placed. */
+function fillFrom(a,i,pool){var p=a[i];if(!isBook()){if(isEmpty(p)){p.photo=pool.shift();return 1}return 0}
+  if(String(p.text||'').trim()||(nSlots(p)===1&&!isEmpty(p)))return 0;var n=0;slotIds(p).forEach(function(id,k){if(!id&&pool.length){setCell(p,k,pool.shift());n++}});return n}
+function placeAt(i,id){var p=A()[i];if(isBook())setCell(p,hitCell,id);else p.photo=id}
 function loadFiles(files,target){var list=Array.prototype.filter.call(files,function(f){return /^image\//.test(f.type)||/\.(jpe?g|png|webp)$/i.test(f.name)});
   list.sort(function(a,b){return String(a.name).localeCompare(String(b.name),undefined,{numeric:true,sensitivity:'base'})});
   var skipped=files.length-list.length;if(!list.length){toast(skipped?'Those files are not JPG or PNG images. Export JPGs from your editor first.':'No images found.');return}
   toast('Adding '+list.length+' photo'+(list.length>1?'s':'')+'…');var ids=[];
   list.reduce(function(pr,f){return pr.then(function(){return readImage(f).then(function(r){var id=uid();addImage(id,{name:f.name,src:r.src,w:r.w,h:r.h,sample:false});ids.push(id)}).catch(function(){skipped++})})},Promise.resolve())
-  .then(function(){var placed=[],rest=ids;if(target!=null&&target>=0&&ids.length){A()[target].photo=ids[0];selected=target;placed.push(pageNumbers(geo())[target]);rest=ids.slice(1)}
+  .then(function(){var placed=[],rest=ids;if(target!=null&&target>=0&&ids.length){placeAt(target,ids[0]);selected=target;placed.push(pageNumbers(geo())[target]);rest=ids.slice(1)}
     if(autoPlace&&rest.length)placed=placed.concat(autoFill(rest));if(placed.length)commit();renderAll();scheduleSave();
     var left=ids.length-placed.length,msg='Added '+ids.length+' photo'+(ids.length===1?'':'s');
     if(placed.length)msg+=placed.length===ids.length?', placed on '+(placed.length===1?'page '+placed[0]:'pages '+Math.min.apply(null,placed)+'–'+Math.max.apply(null,placed)):', placed '+placed.length+' on the empty pages';
     if(left>0&&placed.length)msg+='. '+left+' wait in the tray: no empty pages left';
     toast(msg+(skipped?'. Skipped '+skipped+' file'+(skipped>1?'s':'')+' that would not open.':'.'))})}
-function usedPages(){var g=geo(),nums=pageNumbers(g),u={};S.panels.forEach(function(p,i){if(p.photo){(u[p.photo]=u[p.photo]||[]).push(String(nums[i]))}});
+function usedPages(){var g=geo(),nums=pageNumbers(g),u={};S.panels.forEach(function(p,i){if(isCovered(i))return;(isBook()?slotIds(p):[p.photo]).forEach(function(id){if(id){(u[id]=u[id]||[]).push(String(nums[i]))}})});
   if(duplex())backArr().forEach(function(p,i){if(p.photo){(u[p.photo]=u[p.photo]||[]).push(nums[i]+'b')}});return u}
 function bothSides(fn){fn(S.panels);if(S.back)fn(S.back)}
 
@@ -751,16 +844,16 @@ function buildSwatches(){$$('[data-sw]').forEach(function(box){var prop=box.data
   h+='<input type="color" data-prop="'+prop+'" id="c-'+prop+'" aria-label="Custom color">';box.innerHTML=h});
   var fs=$('#p-font');Object.keys(FONTS).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=FONTS[k].label;fs.appendChild(o)})}
 function outText(k,v){if(k==='exp'){v=+v||0;return (v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+' EV'}if(k==='zoom')return (+v).toFixed(2)+'×';if(k==='fx'||k==='fy'||k==='vig')return Math.round(v)+'%';if(k==='border'||k==='ps')return fmt(v)+' mm';if(k==='size')return v+' pt';return v}
-function fillInspector(){var g=geo(),p=A()[selected];if(!p)return;var nums=pageNumbers(g),n=S.panels.length,num=nums[selected],b=bOf(p),sd=duplex()?side:'front';
-  $('#ins-page').textContent=(sd==='back'?num+' (back)':num)+' of '+n;$('#ins-role').textContent=roleOf(selected,g,sd);
-  var aw=g.pw-2*b,ah=g.ph-2*b;$('#ins-size').textContent='Page '+fmt(g.pw)+' × '+fmt(g.ph)+' mm · photo area '+fmt(Math.max(0,aw))+' × '+fmt(Math.max(0,ah))+' mm · 300 dpi needs '+Math.round(aw/25.4*300)+' × '+Math.round(ah/25.4*300)+' px';
+function fillInspector(){var g=geo(),p=A()[selected];if(!p)return;var nums=pageNumbers(g),n=S.panels.length,num=nums[selected],b=bOf(p),sd=duplex()?side:'front',spr=isBook()&&p.layout==='spread'&&canSpread(selected);
+  $('#ins-page').textContent=(spr?num+'–'+(num+1):sd==='back'?num+' (back)':num)+' of '+n;$('#ins-role').textContent=spr?'Spread':roleOf(selected,g,sd);
+  var mb=mainBox(selected),aw=mb.w,ah=mb.h;if(isBook())fillLayout(p);$('#ins-size').textContent='Page '+fmt(g.pw)+' × '+fmt(g.ph)+' mm · photo area '+fmt(Math.max(0,aw))+' × '+fmt(Math.max(0,ah))+' mm · 300 dpi needs '+Math.round(aw/25.4*300)+' × '+Math.round(ah/25.4*300)+' px';
   $$('[data-prop]',$('#insp')).forEach(function(el){var k=el.dataset.prop,v=k==='border'?b:p[k];if(el.type==='radio')el.checked=String(v)===el.value;else if(el.type==='checkbox')el.checked=!!v;else if(document.activeElement!==el||el.type!=='textarea')el.value=v==null?'':v});
   $$('.sw button',$('#insp')).forEach(function(bt){bt.setAttribute('aria-pressed',String(String(p[bt.dataset.for]||'').toLowerCase()===bt.dataset.color))});
   updOutputs();var has=!!(p.photo&&images[p.photo]);$('#ph-empty').hidden=has;$('#ph-controls').hidden=!has;$('#patControls').hidden=p.pattern==='none';
   if(has){var im=images[p.photo];$('#ph-name').textContent=im.name;var s=p.fit==='contain'?Math.min(aw/im.w,ah/im.h)*p.zoom:Math.max(aw/im.w,ah/im.h)*p.zoom,dpi=Math.round(25.4/s);
     $('#ph-dpi').innerHTML='<span class="chip '+(dpi>=200?'ok':'warn')+'">'+dpi+' dpi'+(dpi<150?' · may print soft':'')+'</span>'}}
 function updOutputs(){var p=A()[selected];$$('output[data-for]',$('#insp')).forEach(function(o){var k=o.dataset.for;o.textContent=outText(k,k==='border'?bOf(p):p[k])})}
-function syncSheetUI(){var s=S.sheet;$('#s-size').value=s.size;$('#customFields').hidden=s.size!=='Custom';$('#s-cw').value=s.cw;$('#s-ch').value=s.ch;
+function syncSheetUI(){var s=S.sheet;syncBookUI();$('#s-size').value=s.size;$('#customFields').hidden=s.size!=='Custom';$('#s-cw').value=s.cw;$('#s-ch').value=s.ch;
   $('#o-p').checked=s.orient==='portrait';$('#o-l').checked=s.orient==='landscape';$('#s-cols').value=s.cols;$('#s-rows').value=s.rows;
   $('#s-margin').value=s.margin;$('#o-margin').textContent=fmt(s.margin)+' mm';$('#s-border').value=s.border;$('#o-border').textContent=fmt(s.border)+' mm';
   $('#dir-r').checked=s.dir==='rows';$('#dir-c').checked=s.dir!=='rows';$('#dirHint').textContent=s.dir==='rows'?'Strips run across the sheet and fold on vertical lines, so pages turn sideways like a book.':'Strips run down the sheet and fold on horizontal lines, so pages flip up like a calendar.';
@@ -779,7 +872,7 @@ function rebuildGrid(apply){var g0=geo(),p0=path(g0),order=p0.map(function(i){re
   S.panels=arr;S.back=barr;if(selected>=arr.length)selected=0;commit();renderAll();if(dropped)toast(dropped+' page'+(dropped>1?'s':'')+' no longer fit. Undo brings them back.')}
 
 /* ---------- events: sheet ---------- */
-$('#s-size').addEventListener('change',function(e){S.sheet.size=e.target.value;$('#customFields').hidden=S.sheet.size!=='Custom';commit();renderAll()});
+$('#s-size').addEventListener('change',function(e){S.sheet.size=e.target.value;$('#customFields').hidden=S.sheet.size!=='Custom';commit();syncBookUI();renderAll()});
 ['s-cw','s-ch'].forEach(function(id){$('#'+id).addEventListener('change',function(e){var v=Math.min(1000,Math.max(80,+e.target.value||0));e.target.value=v;S.sheet[id==='s-cw'?'cw':'ch']=v;commit();renderAll()})});
 $$('input[name=orient]').forEach(function(r){r.addEventListener('change',function(){S.sheet.orient=r.value;commit();renderAll()})});
 $('#s-cols').addEventListener('change',function(e){var v=Math.min(6,Math.max(2,Math.round(+e.target.value||3)));e.target.value=v;if(v!==S.sheet.cols)rebuildGrid(function(){S.sheet.cols=v})});
@@ -803,6 +896,10 @@ insp.addEventListener('input',function(e){var el=e.target.closest('[data-prop]')
   if(k==='fit'||k==='pattern'||el.type==='color'||el.type==='checkbox'||el.type==='radio')fillInspector();else{updOutputs();if(k==='zoom'||k==='border')fillInspector()}draw()});
 insp.addEventListener('change',function(e){if(e.target.closest('[data-prop]')){commit();renderTray()}});
 insp.addEventListener('click',function(e){var bt=e.target.closest('.sw button');if(!bt)return;var p=A()[selected];p[bt.dataset.for]=bt.dataset.color;fillInspector();draw();commit()});
+insp.addEventListener('click',function(e){var z=e.target.closest('[data-zoom]'),n=e.target.closest('[data-nudge]');if(!z&&!n)return;var p=A()[selected];if(!p||!p.photo)return;
+  if(z){p.zoom=z.dataset.zoom==='reset'?1:Math.max(0.5,Math.min(3,Math.round(((+p.zoom||1)+(+z.dataset.zoom))*100)/100));if(z.dataset.zoom==='reset'){p.fx=50;p.fy=50}}
+  else if(n.dataset.nudge==='center'){p.fx=50;p.fy=50}else{var a=n.dataset.nudge.split(','),k=a[0]==='x'?'fx':'fy',d=+a[1];if(printTurned(selected,geo(),p))d=-d;p[k]=Math.max(0,Math.min(100,(+p[k]||0)+d))}
+  fillInspector();draw();commit()});
 $('#ph-remove').addEventListener('click',function(){A()[selected].photo=null;commit();renderAll()});
 $('#clearPage').addEventListener('click',function(){A()[selected]=blankPanel();commit();renderAll();toast('Page cleared. Undo brings it back.')});
 $('#expAll').addEventListener('click',function(){var s=A()[selected],n=0;bothSides(function(a){a.forEach(function(p){if(p.photo){p.exp=+s.exp||0;n++}})});commit();draw();toast('Exposure '+outText('exp',s.exp)+' applied to '+n+' photo'+(n===1?'':'s')+'.')});
@@ -815,7 +912,7 @@ var dz=$('#dropzone');['dragenter','dragover'].forEach(function(t){dz.addEventLi
 ['dragleave','drop'].forEach(function(t){dz.addEventListener(t,function(e){e.preventDefault();dz.classList.remove('over')})});
 dz.addEventListener('drop',function(e){if(e.dataTransfer&&e.dataTransfer.files.length)loadFiles(e.dataTransfer.files,null)});
 var tray=$('#tray');
-tray.addEventListener('click',function(e){var d=e.target.closest('[data-del]');if(d){var id=d.dataset.del;bothSides(function(a){a.forEach(function(p){if(p.photo===id)p.photo=null})});delete images[id];IMG.delete(id);if(armed===id)armed=null;commit();renderAll();scheduleSave();return}
+tray.addEventListener('click',function(e){var d=e.target.closest('[data-del]');if(d){var id=d.dataset.del;bothSides(function(a){a.forEach(function(p){if(p.photo===id)p.photo=null;if(Array.isArray(p.more))p.more=p.more.map(function(m){return m===id?null:m})})});delete images[id];IMG.delete(id);if(armed===id)armed=null;commit();renderAll();scheduleSave();return}
   var t=e.target.closest('.thumb');if(!t)return;armed=armed===t.dataset.id?null:t.dataset.id;renderTray()});
 tray.addEventListener('dragstart',function(e){var t=e.target.closest('.thumb');if(!t)return;e.dataTransfer.setData('text/plain','zine-photo:'+t.dataset.id);e.dataTransfer.effectAllowed='copy'});
 /* Auto-place: photos not yet on any page, sorted by file name, fill empty pages in reading order.
@@ -824,25 +921,31 @@ $('#fillEmpty').addEventListener('click',function(){var g=geo(),u=usedPages(),nu
     pool=Object.keys(images).filter(function(id){return !u[id]}).sort(function(a,b){return String(images[a].name).localeCompare(String(images[b].name),undefined,{numeric:true,sensitivity:'base'})}),
     scope=duplex()?(($('input[name=pscope]:checked')||{}).value||'both'):'front',sides=scope==='both'?['front','back']:[scope],placed={front:0,back:0};
   if(!pool.length){toast(Object.keys(images).length?'Every photo in the tray is already on a page. Add more photos first.':'Add photos first, then auto-place them.');return}
-  sides.forEach(function(sd){var a=sd==='back'?backArr():S.panels;path(g).forEach(function(i){if(pool.length&&isEmpty(a[i])){a[i].photo=pool.shift();placed[sd]++}})});
+  sides.forEach(function(sd){var a=sd==='back'?backArr():S.panels;path(g).forEach(function(i){if(pool.length)placed[sd]+=fillFrom(a,i,pool)})});
   var n=placed.front+placed.back;if(!n){toast('No empty pages left'+(duplex()?' on '+(scope==='both'?'either side':'the '+scope):'')+'. Clear a page first.');return}
   commit();renderAll();var parts=[];if(placed.front)parts.push(placed.front+(duplex()?' on the front':''));if(placed.back)parts.push(placed.back+' on the back');
   toast('Placed '+n+' photo'+(n===1?'':'s')+(duplex()?': '+parts.join(', '):' in page order')+(pool.length?'. '+pool.length+' left in the tray.':'.'))});
 $('#clearAll').addEventListener('click',function(){if(duplex()&&side==='back')S.back=S.panels.map(blankPanel);else S.panels=S.panels.map(blankPanel);commit();renderAll();toast('All pages cleared. Undo brings them back.')});
 
 /* ---------- events: canvas ---------- */
-function hit(e){var r=cv.getBoundingClientRect(),g=geo(),x=(e.clientX-r.left)/viewScale-g.m,y=(e.clientY-r.top)/viewScale-g.m;if(x<0||y<0||x>=g.W-2*g.m||y>=g.H-2*g.m)return -1;
+var hitCell=0;
+function hit(e){var r=cv.getBoundingClientRect(),g=geo();hitCell=0;if(g.book)return hitBook((e.clientX-r.left)/viewScale,(e.clientY-r.top)/viewScale,g.L);var x=(e.clientX-r.left)/viewScale-g.m,y=(e.clientY-r.top)/viewScale-g.m;if(x<0||y<0||x>=g.W-2*g.m||y>=g.H-2*g.m)return -1;
   var c=Math.floor(x/g.pw),rr=Math.floor(y/g.ph);if(c<0||c>=g.cols||rr<0||rr>=g.rows)return -1;var pi=rr*g.cols+c;return duplex()&&side==='back'?mirrorIdx(pi,g):pi}
-cv.addEventListener('pointerdown',function(e){var i=hit(e);if(i<0)return;if(armed){A()[i].photo=armed;selected=i;armed=null;commit();renderAll();return}
+cv.addEventListener('pointerdown',function(e){var i=hit(e);if(i<0)return;if(armed){placeAt(i,armed);selected=i;armed=null;commit();renderAll();return}
+  var pp=A()[i];if(pp&&pp.photo&&images[pp.photo]&&($('#moveMode').checked||e.altKey)&&(i===selected||e.altKey)){selected=i;var g=geo(),mb=mainBox(i),iw=mb.w,ih=mb.h,im=images[pp.photo],sc0=(pp.fit==='contain'?Math.min(iw/im.w,ih/im.h):Math.max(iw/im.w,ih/im.h))*(+pp.zoom||1);
+    pan={i:i,x:e.clientX,y:e.clientY,fx:+pp.fx,fy:+pp.fy,rx:iw-im.w*sc0,ry:ih-im.h*sc0,turn:printTurned(i,g,pp)?-1:1,moved:false};try{cv.setPointerCapture(e.pointerId)}catch(_){}fillInspector();draw();return}
   selected=i;drag={from:i,x:e.clientX,y:e.clientY,active:false,over:i};try{cv.setPointerCapture(e.pointerId)}catch(_){}fillInspector();draw()});
-cv.addEventListener('pointermove',function(e){if(!drag)return;if(!drag.active&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6)drag.active=true;if(drag.active){var i=hit(e);if(i!==drag.over){drag.over=i;draw()}}});
+var pan=null;
+cv.addEventListener('pointermove',function(e){if(pan){var p=A()[pan.i],dx=(e.clientX-pan.x)/viewScale*pan.turn,dy=(e.clientY-pan.y)/viewScale*pan.turn;
+    if(Math.abs(pan.rx)>0.05)p.fx=Math.max(0,Math.min(100,pan.fx+dx/pan.rx*100));if(Math.abs(pan.ry)>0.05)p.fy=Math.max(0,Math.min(100,pan.fy+dy/pan.ry*100));pan.moved=true;updOutputs();draw();return}
+  if(!drag)return;if(!drag.active&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6)drag.active=true;if(drag.active){var i=hit(e);if(i!==drag.over){drag.over=i;draw()}}});
 function endDrag(){if(!drag)return;var d=drag;drag=null;if(d.active&&d.over>=0&&d.over!==d.from){var nums=pageNumbers(geo()),a=A(),t=a[d.from];a[d.from]=a[d.over];a[d.over]=t;selected=d.over;commit();toast('Swapped pages '+nums[d.from]+' and '+nums[d.over]+'.')}renderAll()}
-cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',function(){drag=null;draw()});
+cv.addEventListener('pointerup',function(){if(pan){var m=pan.moved;pan=null;if(m){commit();fillInspector()}return}endDrag()});cv.addEventListener('pointercancel',function(){if(pan){pan=null;commit()}drag=null;draw()});
 cv.addEventListener('dragover',function(e){e.preventDefault();var i=hit(e);if(i!==dropOver){dropOver=i;draw()}});
 cv.addEventListener('dragleave',function(){dropOver=-1;draw()});
 cv.addEventListener('drop',function(e){e.preventDefault();var i=hit(e);dropOver=-1;if(i<0){draw();return}
   if(e.dataTransfer.files&&e.dataTransfer.files.length){loadFiles(e.dataTransfer.files,i);return}
-  var d=e.dataTransfer.getData('text/plain');if(d&&d.indexOf('zine-photo:')===0){var id=d.slice(11);if(images[id]){A()[i].photo=id;selected=i;commit()}}renderAll()});
+  var d=e.dataTransfer.getData('text/plain');if(d&&d.indexOf('zine-photo:')===0){var id=d.slice(11);if(images[id]){placeAt(i,id);selected=i;commit()}}renderAll()});
 
 /* ---------- toolbar ---------- */
 $('#undo').addEventListener('click',undo);$('#redo').addEventListener('click',redo);
@@ -860,8 +963,8 @@ function saveErr(e){var c=e&&e.code;if(c==='declined')return 'Download cancelled
 $('#openFile').addEventListener('change',function(e){var f=e.target.files[0];e.target.value='';if(!f)return;var r=new FileReader();r.onload=function(){try{var o=JSON.parse(r.result);if(!o||!o.sheet||!Array.isArray(o.panels))throw 0;
     loadProject(o,{id:null,name:String(f.name).replace(/\.json$/i,'').replace(/^skylux-zine-project$/,'')});closeProj();showEditor();toast('Opened '+f.name+'. Save it to keep it in your projects.')}catch(_){toast('That file is not a Skylux Zine Lab project.')}};r.readAsText(f)});
 function loadProject(o,meta){loading=true;images={};IMG.clear();Object.keys(o.images||{}).forEach(function(id){var m=o.images[id];if(!m)return;m=Object.assign({},m);if(!m.src&&m.asset)m.src='/_blob/'+m.asset;if(m.src)addImage(id,m)});
-  S.sheet=Object.assign(defSheet(),o.sheet);if(!o.sheet||!o.sheet.dir)S.sheet.dir='cols';var n=S.sheet.cols*S.sheet.rows;S.panels=[];for(var i=0;i<n;i++)S.panels.push(Object.assign(blankPanel(),o.panels[i]||{}));
-  S.back=Array.isArray(o.back)?S.panels.map(function(_,j){return Object.assign(blankPanel(),o.back[j]||{})}):null;side='front';
+  S.sheet=Object.assign(defSheet(),o.sheet);if(!o.sheet||!o.sheet.dir)S.sheet.dir='cols';S.sheet.bk=Object.assign(defBk(),S.sheet.bk||{});var n=nPages();S.panels=[];for(var i=0;i<n;i++)S.panels.push(Object.assign(blankPanel(),o.panels[i]||{}));
+  S.back=Array.isArray(o.back)&&!isBook()?S.panels.map(function(_,j){return Object.assign(blankPanel(),o.back[j]||{})}):null;side='front';
   selected=0;armed=null;current=meta||{id:null,name:''};dirty=false;clearTimeout(cloudTimer);syncSheetUI();hist=[];hi=-1;commit();renderAll();updUndo();updProjUI();loading=false;
   idbSet('project',projectObj())}
 
@@ -938,7 +1041,8 @@ $('#pj-download').addEventListener('click',function(){var ids=Object.keys(images
     return saveFile(fn+'.json',new Blob([s],{type:'application/json'})).then(function(){$('#pj-msg').textContent='Downloaded '+fn+'.json.'})}).catch(function(e){$('#pj-msg').textContent=e&&e.code?saveErr(e):'Could not prepare the file.'})});
 
 /* ---------- PDF export ---------- */
-function openExp(){var g=geo(),empty=S.panels.filter(isEmpty).length+(duplex()?backArr().filter(isEmpty).length:0);$('#e-printhint').textContent=duplex()?'Print pages 1 and 2 at 100% (Actual size) as one two-sided sheet, flipping on the '+(S.sheet.flip==='short'?'short':'long')+' edge. Turn off “Fit to page”.':'Print at 100% (Actual size), single-sided. Turn off “Fit to page”.';
+function openExp(){if(isBook()){openBookExp();return}$('#e-ticks-l').textContent='Fold, trim and centre marks in the margin';$('#e-guide-l').textContent='Add a page with cutting and folding instructions';
+  $('#e-testhint').textContent='Prints big page numbers and a “top” arrow instead of your photos. Fold one on plain paper to check the order, which way up each page reads, and, for two-sided printing, that the back lines up with the front.';var g=geo(),empty=S.panels.filter(isEmpty).length+(duplex()?backArr().filter(isEmpty).length:0);$('#e-printhint').textContent=duplex()?'Print pages 1 and 2 at 100% (Actual size) as one two-sided sheet, flipping on the '+(S.sheet.flip==='short'?'short':'long')+' edge. Turn off “Fit to page”.':'Print at 100% (Actual size), single-sided. Turn off “Fit to page”.';
   $('#exp-summary').textContent=sizeLabel()+' · '+fmt(g.W)+' × '+fmt(g.H)+' mm · '+(g.cols*g.rows)+' pages'+(duplex()?' · both sides':'')+(empty?' · '+empty+' page'+(empty>1?'s are':' is')+' still empty':'');$('#exp-msg').textContent='';$('#exp').hidden=false;$('#expGo').focus()}
 function closeExp(){$('#exp').hidden=true;$('#exportBtn').focus()}
 $('#exportBtn').addEventListener('click',openExp);$('#expCancel').addEventListener('click',closeExp);
@@ -947,6 +1051,7 @@ function ensureFonts(){if(!document.fonts)return Promise.resolve();return Promis
 function decodeAll(){return Promise.all(Array.from(IMG.values()).map(function(im){return im.decode?im.decode().catch(function(){}):Promise.resolve()}))}
 $('#expGo').addEventListener('click',function(){var btn=$('#expGo'),msg=$('#exp-msg');if(!window.jspdf){msg.textContent='The PDF library did not load. Check your connection and reload the page.';return}
   btn.disabled=true;msg.textContent='Rendering the sheet…';
+  if(isBook()){setTimeout(function(){ensureFonts().then(decodeAll).then(exportBook).catch(function(e){msg.textContent=(e&&e.code)?saveErr(e):'Could not build the PDF. Try a lower resolution.'}).then(function(){btn.disabled=false})},30);return}
   setTimeout(function(){ensureFonts().then(decodeAll).then(function(){var g=geo(),dpi=+$('#e-dpi').value,ppm=dpi/25.4,MAX=16e6,note='';
     if(g.W*ppm*g.H*ppm>MAX){ppm=Math.sqrt(MAX/(g.W*g.H));dpi=Math.floor(ppm*25.4);ppm=dpi/25.4;note=' Rendered at '+dpi+' dpi, the most this browser can handle for this size.'}
     var test=$('#e-test').checked;
@@ -1008,7 +1113,7 @@ function drawGuideDiagram(cv2){var g=geo(),box=cv2.parentElement,maxW=Math.min(5
   x.strokeStyle='#1971c2';x.lineWidth=1.5;x.setLineDash([5,4]);var fl=folds(g);fl.forEach(function(l){strokeLine(x,l,k)});x.setLineDash([]);
   var fs=Math.max(8,fz*0.7);x.font='700 '+fs+'px "JetBrains Mono", monospace';fl.forEach(function(l){var mx=(l.dir==='h'?l.x1+g.pw*0.82:l.x1)*k,my=(l.dir==='h'?l.y1:l.y1+g.ph*0.25)*k;x.fillStyle='#1971c2';x.beginPath();x.arc(mx,my,fs*0.75,0,Math.PI*2);x.fill();x.fillStyle='#ffffff';x.fillText(l.type,mx,my+0.5)});
   x.textAlign='left';x.textBaseline='alphabetic'}
-function openGuide(){var g=geo();$('#gd-sub').textContent=sizeLabel()+' · '+fmt(g.W)+' × '+fmt(g.H)+' mm · '+g.cols+' strips × '+g.rows+' pages = '+(g.cols*g.rows)+' pages';
+function openGuide(){if(isBook()){openBookGuide();return}$('#gd-h').textContent='How to cut and fold';var g=geo();$('#gd-sub').textContent=sizeLabel()+' · '+fmt(g.W)+' × '+fmt(g.H)+' mm · '+g.cols+' strips × '+g.rows+' pages = '+(g.cols*g.rows)+' pages';
   $('#gd-tools').innerHTML=guideTools().map(function(t){return '<li>'+esc(t)+'</li>'}).join('');
   $('#gd-steps').innerHTML=guideSteps(g).map(function(s){return '<li><strong>'+esc(s.t)+'.</strong> '+esc(s.b)+'</li>'}).join('');
   $('#guide').hidden=false;drawGuideDiagram($('#gd-cv'));$('#gd-close').focus()}
@@ -1016,7 +1121,7 @@ function closeGuide(){$('#guide').hidden=true;$('#guideBtn').focus()}
 $('#guideBtn').addEventListener('click',openGuide);$('#gd-close').addEventListener('click',closeGuide);
 $('#gd-export').addEventListener('click',function(){closeGuide();openExp()});
 $('#guide').addEventListener('click',function(e){if(e.target.id==='guide')closeGuide()});
-window.addEventListener('resize',function(){if(!$('#guide').hidden)drawGuideDiagram($('#gd-cv'))});
+window.addEventListener('resize',function(){if(!$('#guide').hidden){if(isBook())drawBookDiagram($('#gd-cv'));else drawGuideDiagram($('#gd-cv'))}});
 
 /* ---------- zine preview ---------- */
 var VW={idx:0,mode:'spread',imgs:{},spreads:[],singles:[],busy:false,pw:0};
@@ -1024,7 +1129,7 @@ var book=$('#book'),slotL=$('#slotL'),slotR=$('#slotR'),stage=$('#vw-stage');
 var reduceMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function tokPage(t){return +String(t).slice(1)}
 function tokLabel(t){return 'p.'+tokPage(t)+(t[0]==='B'?' back':'')}
-function renderPages(){var g=geo(),order=path(g),n=order.length,two=duplex(),fold=$('#vw-fold').checked&&!two,dpr=Math.min(2,window.devicePixelRatio||1),targetH=Math.min(1100,Math.max(320,window.innerHeight*0.72*dpr)),sc=targetH/g.ph,k;
+function renderPages(){if(isBook()){renderBookPages();return}var g=geo(),order=path(g),n=order.length,two=duplex(),fold=$('#vw-fold').checked&&!two,dpr=Math.min(2,window.devicePixelRatio||1),targetH=Math.min(1100,Math.max(320,window.innerHeight*0.72*dpr)),sc=targetH/g.ph,k;
   $('#vw-fold').closest('label').hidden=two;VW.imgs={};
   function rend(num,sd){var i=order[num-1],R=rectOf(i,g),c=document.createElement('canvas');c.width=Math.round(g.pw*sc);c.height=Math.round(g.ph*sc);var x=c.getContext('2d');
     var pp=sd==='B'?backArr()[i]:S.panels[i];if(fold&&(oddStrip(i,g)!==printTurned(i,g,pp))){x.translate(c.width,c.height);x.rotate(Math.PI)}x.translate(-R.x*sc,-R.y*sc);drawPanel(x,pp,R,sc);
@@ -1038,7 +1143,7 @@ function renderPages(){var g=geo(),order=path(g),n=order.length,two=duplex(),fol
 function setSlot(el,t){el.innerHTML=t==null?'':'<img src="'+VW.imgs[t]+'" alt="'+tokLabel(t)+'">';el.classList.toggle('filled',t!=null)}
 function faceHtml(t,cls){return '<div class="face '+cls+'"'+(cls==='back'&&book.classList.contains('vert')?' style="transform:rotateX(180deg)"':'')+'>'+(t==null?'':'<img src="'+VW.imgs[t]+'" alt="">')+'</div>'}
 function vwMax(){return VW.mode==='spread'?VW.spreads.length-1:VW.singles.length-1}
-function vwLayout(){var g=geo(),a=g.pw/g.ph,two=VW.mode==='spread',vert=!byRows(),aw=stage.clientWidth-12,ah=stage.clientHeight-12,pw,ph;book.classList.toggle('vert',vert);
+function vwLayout(){var g=geo(),a=g.pw/g.ph,two=VW.mode==='spread',vert=isBook()?bookLand():!byRows(),aw=stage.clientWidth-12,ah=stage.clientHeight-12,pw,ph;book.classList.toggle('vert',vert);
   if(vert&&two){pw=Math.max(60,Math.min(aw,ah/2*a));ph=pw/a;book.style.width=pw+'px';book.style.height=2*ph+'px';slotL.style.left='0px';slotL.style.top='0px';slotR.style.left='0px';slotR.style.top=ph+'px'}
   else{var cols=two?2:1;pw=Math.max(60,Math.min(aw/cols,ah*a));ph=pw/a;book.style.width=pw*cols+'px';book.style.height=ph+'px';slotL.style.left='0px';slotL.style.top='0px';slotR.style.left=(cols===2?pw:0)+'px';slotR.style.top='0px'}
   VW.pw=pw;VW.ph=ph;book.style.setProperty('--pw',pw+'px');book.style.setProperty('--ph',ph+'px');slotL.hidden=!two}
@@ -1133,19 +1238,245 @@ $('#ai-sugg').addEventListener('click',function(e){var b=e.target.closest('[data
   if(e.target.id==='ai-addall'){var n=0;aiSugg.forEach(function(s,i){if(!s.added&&addSugg(i))n++});if(n){commit();renderAll()}renderSugg();if(n)$('#ai-msg').textContent='Added '+n+' word page'+(n===1?'':'s')+'.'}
   if(e.target.id==='ai-again')suggestWords(true)});
 
+/* ---------- stapled booklet ----------
+   S.panels holds the booklet pages in reading order (index 0 is page 1, the front cover). Imposition works in one frame:
+   a book bound on its left edge. A landscape booklet with its spine on top is that same book turned a quarter turn, so its
+   pages are drawn turned 90° counter-clockwise on the sheet. */
+var BK_THICK={plain:0.1,thick:0.18,photo:0.25};
+function defBk(){return {fold:'once',pages:16,shape:'portrait',paper:'plain',flip:null}}
+function isBook(){return S.sheet.format==='booklet'}
+function bk(){if(!S.sheet.bk)S.sheet.bk=defBk();return S.sheet.bk}
+function bookN(){var b=bk();return b.fold==='twice'?8:Math.max(4,Math.min(48,Math.round((+b.pages||16)/4)*4))}
+function nPages(){return isBook()?bookN():S.sheet.cols*S.sheet.rows}
+function bookLand(){return bk().shape==='landscape'}
+function paperSL(size){size=size||S.sheet.size;var w,h,d=SIZES[size];if(size==='Custom'||!d){w=+S.sheet.cw||300;h=+S.sheet.ch||400}else{w=d[0];h=d[1]}return [Math.min(w,h),Math.max(w,h)]}
+/* cw × ch: one page as it sits on the sheet (bound left). RW × RH: the page as the reader sees it. W × H: the printed sheet. */
+function bdims(sl,twice,land,N,paper){var s=sl[0],l=sl[1],cw,ch,W,H;if(twice){cw=s/2;ch=l/2;W=s;H=l}else{cw=l/2;ch=s;W=l;H=s}
+  return {N:N,twice:twice,cw:cw,ch:ch,W:W,H:H,RW:land?ch:cw,RH:land?cw:ch,land:land,sheets:twice?1:N/4,t:BK_THICK[paper]||0.1}}
+function bgeo(){var b=bk(),B=bdims(paperSL(),b.fold==='twice',bookLand(),bookN(),b.paper);B.m=+S.sheet.margin;return B}
+/* Page slots on each printed side. n: page number; x, y: slot corner on the sheet; rot: 1 if the page prints upside down;
+   d: how many sheet thicknesses the page sits inside the booklet, which sets the creep shift.
+   The back is listed as seen after turning the sheet over sideways, around its vertical centre line.
+   Folded in half: sheet s (0 = outermost) carries N−2s | 2s+1 on the front and 2s+2 | N−2s−1 on the back.
+   Folded twice: the top half folds behind and becomes the inner pair of leaves once the top fold is trimmed open. */
+function impose(B){var out=[],N=B.N,s;
+  if(B.twice){out.push({front:[{n:5,x:0,y:0,rot:1,d:1},{n:4,x:B.cw,y:0,rot:1,d:1},{n:8,x:0,y:B.ch,rot:0,d:0},{n:1,x:B.cw,y:B.ch,rot:0,d:0}],
+    back:[{n:3,x:0,y:0,rot:1,d:1},{n:6,x:B.cw,y:0,rot:1,d:1},{n:2,x:0,y:B.ch,rot:0,d:0},{n:7,x:B.cw,y:B.ch,rot:0,d:0}]});return out}
+  for(s=0;s<B.sheets;s++)out.push({front:[{n:N-2*s,x:0,y:0,rot:0,d:s},{n:2*s+1,x:B.cw,y:0,rot:0,d:s}],back:[{n:2*s+2,x:0,y:0,rot:0,d:s},{n:N-2*s-1,x:B.cw,y:0,rot:0,d:s}]});return out}
+/* Turning the sheet over sideways is a short-edge flip for a landscape sheet and a long-edge flip for a portrait one. */
+function naturalFlip(B){return B.W>B.H?'short':'long'}
+function bookFlip(B){return bk().flip||naturalFlip(B)}
+function maxCreep(B){return B.twice?B.t:(B.sheets-1)*B.t}
+/* A spread is stored on its left (or upper) page, which must be even and have a facing page. */
+function canSpread(i){var n=i+1;return isBook()&&n%2===0&&n<nPages()}
+function isCovered(i){return isBook()&&i>0&&(i+1)%2===1&&!!S.panels[i-1]&&S.panels[i-1].layout==='spread'&&canSpread(i-1)}
+function ownerOf(i){return isCovered(i)?i-1:i}
+function isSpread(i){var p=S.panels[i];return !!p&&p.layout==='spread'&&canSpread(i)}
+function nSlots(p){return p.layout==='four'?4:p.layout==='two'?2:1}
+function slotIds(p){var a=[p.photo||null],m=p.more||[];for(var k=1;k<nSlots(p);k++)a.push(m[k-1]||null);return a}
+function setCell(p,k,id){if(!(k>0)||nSlots(p)===1){p.photo=id;return}if(!Array.isArray(p.more))p.more=[];p.more[k-1]=id}
+function normalizeBook(){if(!isBook())return;S.panels.forEach(function(p,i){if(p.layout==='spread'&&!canSpread(i))p.layout='frame'})}
+function cellRects(p,RW,RH){var b=p.layout==='bleed'?0:bOf(p),x=b,y=b,w=RW-2*b,h=RH-2*b,n=nSlots(p),g=b>0?Math.max(1.5,b*0.75):0;
+  if(n===1)return [{x:x,y:y,w:w,h:h}];
+  if(n===2){if(h>=w){var hh=(h-g)/2;return [{x:x,y:y,w:w,h:hh},{x:x,y:y+hh+g,w:w,h:hh}]}var ww=(w-g)/2;return [{x:x,y:y,w:ww,h:h},{x:x+ww+g,y:y,w:ww,h:h}]}
+  var w2=(w-g)/2,h2=(h-g)/2;return [{x:x,y:y,w:w2,h:h2},{x:x+w2+g,y:y,w:w2,h:h2},{x:x,y:y+h2+g,w:w2,h:h2},{x:x+w2+g,y:y+h2+g,w:w2,h:h2}]}
+/* The two-page area of a spread in the coordinates of one of its pages (part 0: left or upper page, part 1: right or lower). */
+function spreadRect(part,B){return B.land?{x:0,y:-part*B.RH,w:B.RW,h:2*B.RH}:{x:-part*B.RW,y:0,w:2*B.RW,h:B.RH}}
+function mainBox(i){var p=A()[i],b=bOf(p);if(!isBook()){var g=geo();return {w:g.pw-2*b,h:g.ph-2*b}}
+  var B=bgeo();if(isSpread(i)){var R=spreadRect(0,B);return {w:R.w-2*b,h:R.h-2*b}}var c=cellRects(p,B.RW,B.RH)[0];return {w:c.w,h:c.h}}
+function bookRole(i){var n=i+1,N=nPages(),L=bookLand();if(n===1)return 'Front cover';if(n===N)return 'Back cover';if(n===2)return 'Inside front cover';if(n===N-1)return 'Inside back cover';
+  return n%2===0?(L?'Upper page':'Left page'):(L?'Lower page':'Right page')}
+function cellPlaceholder(ctx,x,y,w,h){ctx.save();ctx.strokeStyle='rgba(20,32,26,.28)';ctx.setLineDash([4,4]);ctx.lineWidth=1;ctx.strokeRect(x+3,y+3,w-6,h-6);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(20,32,26,.4)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='600 '+Math.max(10,Math.min(22,Math.min(w,h)*0.22))+'px "Instrument Sans", Arial, sans-serif';ctx.fillText('+',x+w/2,y+h/2);ctx.restore()}
+/* Draws page i as the reader sees it, with its top-left corner at the current origin. */
+function drawBookPage(ctx,i,sc,o){var B=o.B||bgeo(),own=ownerOf(i),p=S.panels[own],part=i-own,W=B.RW*sc,H=B.RH*sc;if(!p)return;
+  ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
+  if(isSpread(own)){var R=spreadRect(part,B),x=R.x*sc,y=R.y*sc,w=R.w*sc,h=R.h*sc,b=bOf(p)*sc;
+    ctx.fillStyle=p.bg;ctx.fillRect(x,y,w,h);if(p.pattern&&p.pattern!=='none')drawPattern(ctx,p,x,y,w,h,sc);
+    if(!photoIn(ctx,p,p.photo,x+b,y+b,w-2*b,h-2*b,true)&&o.preview&&!String(p.text||'').trim())cellPlaceholder(ctx,x+b,y+b,w-2*b,h-2*b);
+    if(String(p.text||'').trim())drawText(ctx,p,x,y,w,h,sc)}
+  else withTurn(ctx,{x:0,y:0,w:B.RW,h:B.RH},sc,!!p.flip,function(){
+    if(nSlots(p)===1){drawPanel(ctx,p.layout==='bleed'?Object.assign({},p,{border:0}):p,{x:0,y:0,w:B.RW,h:B.RH},sc);return}
+    ctx.fillStyle=p.bg;ctx.fillRect(0,0,W,H);if(p.pattern&&p.pattern!=='none')drawPattern(ctx,p,0,0,W,H,sc);var ids=slotIds(p);
+    cellRects(p,B.RW,B.RH).forEach(function(c,k){if(!photoIn(ctx,p,ids[k],c.x*sc,c.y*sc,c.w*sc,c.h*sc,k===0)&&o.preview)cellPlaceholder(ctx,c.x*sc,c.y*sc,c.w*sc,c.h*sc)});
+    if(String(p.text||'').trim())drawText(ctx,p,0,0,W,H,sc)});
+  ctx.restore()}
+/* The editing board: every spread in reading order, the cover alone first and the back cover alone last. */
+function boardLayout(){var B=bgeo(),N=B.N,sp=[[null,0]],k;for(k=2;k<=N;k+=2)sp.push([k-1,k<N?k:null]);
+  var per=B.land?(N<=8?3:4):(N<=8?2:3),u=Math.min(B.RW,B.RH),gx=u*0.14,gy=u*0.18,SW=B.land?B.RW:2*B.RW,SH=B.land?2*B.RH:B.RH,rows=Math.ceil(sp.length/per),slots=[],spreads=[];
+  sp.forEach(function(pair,j){var c=j%per,r=Math.floor(j/per),x=c*(SW+gx),y=r*(SH+gy);spreads.push({x:x,y:y,w:SW,h:SH,pair:pair});
+    pair.forEach(function(i,part){if(i==null)return;slots.push({i:i,part:part,x:B.land?x:x+part*B.RW,y:B.land?y+part*B.RH:y,w:B.RW,h:B.RH})})});
+  return {B:B,W:per*SW+(per-1)*gx,H:rows*SH+(rows-1)*gy,slots:slots,spreads:spreads,SH:SH}}
+function slotsOf(L,i){return L.slots.filter(function(s){return ownerOf(s.i)===i})}
+function hitBook(x,y,L){var B=L.B;for(var j=0;j<L.slots.length;j++){var sl=L.slots[j];if(x>=sl.x&&x<sl.x+sl.w&&y>=sl.y&&y<sl.y+sl.h){var own=ownerOf(sl.i),p=S.panels[own];
+    if(nSlots(p)>1&&!isSpread(own)){var lx=x-sl.x,ly=y-sl.y;if(p.flip){lx=B.RW-lx;ly=B.RH-ly}cellRects(p,B.RW,B.RH).forEach(function(c,k){if(lx>=c.x-1&&lx<c.x+c.w+1&&ly>=c.y-1&&ly<c.y+c.h+1)hitCell=k})}
+    return own}}return -1}
+function drawBoard(ctx,sc,o){var L=boardLayout(),B=L.B,N=B.N;ctx.save();
+  if(!o.preview){ctx.fillStyle='#ffffff';ctx.fillRect(0,0,L.W*sc,L.H*sc)}
+  else L.slots.forEach(function(sl){ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(sl.x*sc+2,sl.y*sc+3,sl.w*sc,sl.h*sc)});
+  L.slots.forEach(function(sl){ctx.save();ctx.translate(sl.x*sc,sl.y*sc);drawBookPage(ctx,sl.i,sc,{B:B,preview:o.preview});
+    var own=ownerOf(sl.i),p=S.panels[own];
+    if(o.preview&&isEmpty(p)&&nSlots(p)===1&&!isSpread(own)){var w=sl.w*sc,h=sl.h*sc,big=Math.max(14,Math.min(h*0.4,w*0.4));ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(20,32,26,.16)';ctx.font='700 '+big+'px "Bricolage Grotesque", Arial, sans-serif';ctx.fillText(String(sl.i+1),w/2,h*0.46);
+      ctx.fillStyle='rgba(20,32,26,.5)';ctx.font='500 '+Math.max(9,Math.min(13,h*0.07))+'px "Instrument Sans", Arial, sans-serif';ctx.fillText('+ Drop a photo',w/2,h*0.78)}
+    ctx.restore()});
+  if(o.preview){ctx.strokeStyle='rgba(20,32,26,.35)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    L.spreads.forEach(function(s){if(s.pair[0]!=null&&s.pair[1]!=null){ctx.beginPath();if(B.land){ctx.moveTo(s.x*sc,(s.y+B.RH)*sc);ctx.lineTo((s.x+s.w)*sc,(s.y+B.RH)*sc)}else{ctx.moveTo((s.x+B.RW)*sc,s.y*sc);ctx.lineTo((s.x+B.RW)*sc,(s.y+s.h)*sc)}ctx.stroke()}});ctx.setLineDash([]);
+    if(view.numbers){var fz=Math.max(9,Math.min(12,B.RH*sc*0.07));ctx.font='600 '+fz+'px "JetBrains Mono", monospace';
+      var gg={cols:N,rows:1};L.slots.forEach(function(sl){var t=pageLabel(sl.i,gg,'front'),tw=ctx.measureText(t).width,x=sl.x*sc+4,y=sl.y*sc+4;ctx.fillStyle='rgba(14,20,17,.78)';ctx.fillRect(x,y,tw+8,fz+6);ctx.fillStyle='#ffffff';ctx.textBaseline='top';ctx.fillText(t,x+4,y+3.5);ctx.textBaseline='alphabetic'})}
+    function box(i,fill){var ss=slotsOf(L,i);if(!ss.length)return;var x0=Math.min.apply(null,ss.map(function(s){return s.x})),y0=Math.min.apply(null,ss.map(function(s){return s.y})),
+        x1=Math.max.apply(null,ss.map(function(s){return s.x+s.w})),y1=Math.max.apply(null,ss.map(function(s){return s.y+s.h}));
+      if(fill){ctx.fillStyle='rgba(214,51,108,.18)';ctx.fillRect(x0*sc,y0*sc,(x1-x0)*sc,(y1-y0)*sc);ctx.lineWidth=3;ctx.strokeStyle='#d6336c';ctx.strokeRect(x0*sc+1.5,y0*sc+1.5,(x1-x0)*sc-3,(y1-y0)*sc-3);return}
+      ctx.lineWidth=3;ctx.strokeStyle='#ffd43b';ctx.strokeRect(x0*sc+1.5,y0*sc+1.5,(x1-x0)*sc-3,(y1-y0)*sc-3);ctx.lineWidth=1;ctx.strokeStyle='#14201a';ctx.strokeRect(x0*sc+3.5,y0*sc+3.5,(x1-x0)*sc-7,(y1-y0)*sc-7)}
+    box(selected,false);var tgt=drag&&drag.active?drag.over:dropOver;if(tgt>=0)box(tgt,true)}
+  ctx.restore()}
+/* One printed side: each page goes into its slot, turned as the folding needs, and nudged toward the spine by the creep of its sheet. */
+function drawBookSheet(ctx,sc,B,slots,o){ctx.fillStyle='#ffffff';ctx.fillRect(0,0,B.W*sc,B.H*sc);
+  slots.forEach(function(sl){var sh=sl.d*B.t,dx=(sl.x+B.cw/2<B.cw)?sh:-sh;ctx.save();ctx.beginPath();ctx.rect(sl.x*sc,sl.y*sc,B.cw*sc,B.ch*sc);ctx.clip();
+    ctx.translate((sl.x+B.cw/2+dx)*sc,(sl.y+B.ch/2)*sc);ctx.rotate((sl.rot?Math.PI:0)+(B.land?-Math.PI/2:0));ctx.translate(-B.RW/2*sc,-B.RH/2*sc);
+    if(o.test)drawBookTest(ctx,sl.n,B,sc);else drawBookPage(ctx,sl.n-1,sc,{B:B});ctx.restore()});
+  var m=B.m;if(m>0){ctx.fillStyle='#ffffff';ctx.fillRect(0,0,B.W*sc,m*sc);ctx.fillRect(0,(B.H-m)*sc,B.W*sc,m*sc);ctx.fillRect(0,0,m*sc,B.H*sc);ctx.fillRect((B.W-m)*sc,0,m*sc,B.H*sc)}}
+function drawBookTest(ctx,n,B,sc){var w=B.RW*sc,h=B.RH*sc,u=Math.min(w,h);ctx.save();ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#a3a3a3';ctx.lineWidth=Math.max(1,0.25*sc);ctx.strokeRect(3*sc,3*sc,w-6*sc,h-6*sc);
+  ctx.fillStyle='#8c8c8c';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='700 '+Math.round(u*0.42)+'px Arial, sans-serif';ctx.fillText(String(n),w/2,h*0.54);
+  ctx.font='600 '+Math.round(u*0.07)+'px Arial, sans-serif';ctx.fillText(n===1?'page 1 · front cover':n===B.N?'page '+n+' · back cover':'page '+n,w/2,h*0.86);
+  ctx.beginPath();ctx.moveTo(w/2,h*0.06);ctx.lineTo(w/2-u*0.06,h*0.06+u*0.1);ctx.lineTo(w/2+u*0.06,h*0.06+u*0.1);ctx.closePath();ctx.fill();
+  ctx.font='600 '+Math.round(u*0.055)+'px Arial, sans-serif';ctx.fillText('top',w/2,h*0.06+u*0.15);
+  var ev=n%2===0;ctx.save();ctx.translate(B.land?w/2:(ev?w-7*sc:7*sc),B.land?(ev?h-7*sc:7*sc):h/2);if(!B.land)ctx.rotate(ev?Math.PI/2:-Math.PI/2);ctx.font='600 '+Math.round(u*0.045)+'px Arial, sans-serif';ctx.fillText('spine side',0,0);ctx.restore();
+  ctx.restore()}
+function pagesOptions(sel,val){var h='';for(var k=4;k<=48;k+=4)h+='<option value="'+k+'">'+k+' pages · '+(k/4)+' sheet'+(k>4?'s':'')+'</option>';if(sel.dataset.built!=='1'){sel.innerHTML=h;sel.dataset.built='1'}sel.value=String(val)}
+function bookHint(B){var t='Each page is '+fmt(B.RW)+' × '+fmt(B.RH)+' mm. ';
+  if(B.twice)t+='One sheet, printed on both sides, folds in half twice into 8 small pages; after stapling, trim the top fold open.';
+  else t+=B.sheets+' sheet'+(B.sheets>1?'s':'')+' printed on both sides, folded in half'+(B.sheets>1?' and tucked inside each other':'')+', then stapled on the fold.';
+  var c=maxCreep(B);if(c>0)t+=' Inner pages shift up to '+fmt(c)+' mm toward the spine, because they stick out a little once nested (creep).';return t}
+function syncBookUI(){var on=isBook(),b=bk();document.body.classList.toggle('is-book',on);$('#fm-m').checked=!on;$('#fm-b').checked=on;
+  $('.brand p').textContent=on?'Lay out the pages, print the sheets on both sides, fold, nest and staple them into a booklet.':'Lay out one sheet, print it single-sided, cut the slits and fold it into a zig-zag zine.';
+  $('#guideBtn').textContent=on?'Fold and staple guide':'Cut and fold guide';
+  if(!on)return;var B=bgeo(),nf=naturalFlip(B);$('#bf-1').checked=!B.twice;$('#bf-2').checked=B.twice;pagesOptions($('#bk-pages'),B.N);$('#bk-pages-f').hidden=B.twice;
+  $('#bs-p').checked=!B.land;$('#bs-l').checked=B.land;$('#bk-paper').value=b.paper||'plain';$('#bkHint').textContent=bookHint(B);
+  $('#bfl-l').checked=bookFlip(B)==='long';$('#bfl-s').checked=bookFlip(B)==='short';$('#bk-boffx').value=S.sheet.boffx||0;$('#bk-boffy').value=S.sheet.boffy||0;
+  $('#bflipHint').textContent='For this layout set your printer to flip on the '+nf+' edge. '+(bookFlip(B)!==nf?'You chose the '+bookFlip(B)+' edge, so the back of each sheet prints turned around to match.':'If your printer only flips the other way, pick that edge here and the backs are turned to match.')}
+function rebuildBook(apply){var old=S.panels.slice();apply();var n=nPages(),arr=[];for(var i=0;i<n;i++)arr.push(old[i]||blankPanel());
+  var dropped=old.slice(n).filter(function(p){return !isEmpty(p)}).length;S.panels=arr;S.back=null;if(selected>=n)selected=0;selected=ownerOf(selected);commit();syncSheetUI();renderAll();
+  if(dropped)toast(dropped+' page'+(dropped>1?'s':'')+' no longer fit. Undo brings them back.')}
+function setFormat(f){if((f==='booklet')===isBook())return;var g0=geo(),order,dropped=0;
+  if(f==='booklet'){order=path(g0).map(function(i){return S.panels[i]});if(S.back&&duplex())path(g0).forEach(function(i){if(!isEmpty(S.back[i]))order.push(S.back[i])});
+    var last=order.length;while(last>0&&isEmpty(order[last-1]))last--;S.sheet.format='booklet';S.sheet.duplex=false;side='front';var b=bk();
+    if(b.fold!=='twice')b.pages=Math.max(4,Math.min(48,Math.ceil(Math.max(last,4)/4)*4));var n=bookN();dropped=order.slice(n).filter(function(p){return !isEmpty(p)}).length;
+    S.panels=[];for(var i=0;i<n;i++)S.panels.push(order[i]||blankPanel());S.back=null}
+  else{order=S.panels.slice();S.sheet.format='maze';var g=geo(),p=path(g),arr=new Array(g.cols*g.rows);p.forEach(function(idx,k){arr[idx]=order[k]||blankPanel()});
+    dropped=order.slice(p.length).filter(function(q){return !isEmpty(q)}).length;S.panels=arr;S.back=null}
+  selected=0;commit();syncSheetUI();renderAll();
+  toast((f==='booklet'?'Now a stapled booklet of '+nPages()+' pages.':'Now a maze zine of '+nPages()+' pages.')+' Pages keep their reading order'+(dropped?'; '+dropped+' no longer fit (Undo brings them back).':'.'))}
+function fillLayout(p){var i=selected,lay=isSpread(i)?'spread':(p.layout||'frame');$$('input[name=blay]').forEach(function(r){r.checked=r.value===lay});
+  $('#bl-s').disabled=!(canSpread(i)||(i>0&&canSpread(i-1)));
+  $('#blayHint').textContent=lay==='spread'?'One photo runs across pages '+(i+1)+' and '+(i+2)+', over the fold. Keep faces and text away from the middle.':
+    lay==='two'||lay==='four'?'Drop photos onto each frame on the sheet, or tap a photo in the tray and then a frame. Zoom and position apply to the first frame.':
+    lay==='bleed'?'The photo fills the whole page. Home printers leave a white edge at the paper margin; trim the booklet after stapling for a clean edge.':
+    (i===0||i===nPages()-1?'Covers can’t be spreads: they sit on opposite sides of the booklet.':'A white border frames the photo. Set its width under Photo.');
+  var cells=$('#bkCells');if(nSlots(p)>1&&lay!=='spread'){cells.innerHTML=slotIds(p).map(function(id,k){return '<div class="bk-cell" title="Frame '+(k+1)+'">'+(id&&images[id]?'<img src="'+images[id].src+'" alt=""><button type="button" data-cell="'+k+'" aria-label="Remove the photo from frame '+(k+1)+'">×</button>':(k+1))+'</div>'}).join('');cells.hidden=false}else{cells.innerHTML='';cells.hidden=true}}
+$$('input[name=blay]').forEach(function(r){r.addEventListener('change',function(){var i=selected,p=S.panels[i],v=r.value;
+  if(v==='spread'){if(!canSpread(i)){if(i>0&&canSpread(i-1)){i=i-1;selected=i;p=S.panels[i];var rp=S.panels[i+1];if(!p.photo&&rp.photo){p.photo=rp.photo;p.fx=rp.fx;p.fy=rp.fy;p.zoom=rp.zoom;rp.photo=null}}else{fillInspector();return}}
+    else{var rq=S.panels[i+1];if(!p.photo&&rq&&rq.photo){p.photo=rq.photo;rq.photo=null}}
+    p.layout='spread';toast('Pages '+(i+1)+' and '+(i+2)+' now share one photo across the fold.')}
+  else p.layout=v;commit();renderAll()})});
+$('#bkCells').addEventListener('click',function(e){var b=e.target.closest('[data-cell]');if(!b)return;setCell(S.panels[selected],+b.dataset.cell,null);commit();renderAll()});
+$('#layAll').addEventListener('click',function(){var p=S.panels[selected],v=isSpread(selected)?'spread':p.layout||'frame';if(v==='spread'){toast('Spreads are set pair by pair. Pick a layout other than Spread to use it everywhere.');return}
+  var n=0;S.panels.forEach(function(q,i){if(isCovered(i)||isSpread(i))return;if(q.photo||(q.more||[]).some(Boolean)){q.layout=v;n++}});commit();renderAll();toast('Layout used on '+n+' photo page'+(n===1?'':'s')+'.')});
+$$('input[name=sfmt]').forEach(function(r){r.addEventListener('change',function(){setFormat(r.value)})});
+$$('input[name=bfold]').forEach(function(r){r.addEventListener('change',function(){rebuildBook(function(){bk().fold=r.value})})});
+$('#bk-pages').addEventListener('change',function(e){var v=+e.target.value;rebuildBook(function(){bk().pages=v})});
+$$('input[name=bshape]').forEach(function(r){r.addEventListener('change',function(){bk().shape=r.value;commit();syncSheetUI();renderAll()})});
+$('#bk-paper').addEventListener('change',function(e){bk().paper=e.target.value;commit();syncSheetUI()});
+$$('input[name=bflip]').forEach(function(r){r.addEventListener('change',function(){var nf=naturalFlip(bgeo());bk().flip=r.value===nf?null:r.value;commit();syncSheetUI()})});
+['bk-boffx','bk-boffy'].forEach(function(id){$('#'+id).addEventListener('change',function(e){var v=Math.max(-10,Math.min(10,Math.round((+e.target.value||0)*2)/2));e.target.value=v;S.sheet[id==='bk-boffx'?'boffx':'boffy']=v;commit();toast('The back of each sheet will print shifted '+v+' mm '+(id==='bk-boffx'?'left/right':'up/down')+'.')})});
+
+/* ---------- booklet: preview, PDF and guide ---------- */
+function renderBookPages(){var B=bgeo(),N=B.N,dpr=Math.min(2,window.devicePixelRatio||1),targetH=Math.min(1100,Math.max(320,window.innerHeight*0.72*dpr)),sc=targetH/B.RH,k;
+  $('#vw-fold').closest('label').hidden=true;VW.imgs={};
+  for(k=1;k<=N;k++){var c=document.createElement('canvas');c.width=Math.round(B.RW*sc);c.height=Math.round(B.RH*sc);var x=c.getContext('2d');drawBookPage(x,k-1,sc,{B:B});
+    var own=ownerOf(k-1),p=S.panels[own];if(isEmpty(p)&&nSlots(p)===1&&!isSpread(own)){var big=Math.min(c.height*0.4,c.width*0.4);x.textAlign='center';x.textBaseline='middle';x.fillStyle='rgba(20,32,26,.16)';x.font='700 '+big+'px "Bricolage Grotesque", Arial, sans-serif';x.fillText(String(k),c.width/2,c.height/2)}
+    VW.imgs['F'+k]=c.toDataURL('image/jpeg',0.9)}
+  VW.spreads=[[null,'F1']];for(k=2;k<=N;k+=2)VW.spreads.push(['F'+k,k+1<=N?'F'+(k+1):null]);
+  VW.singles=[];for(k=1;k<=N;k++)VW.singles.push('F'+k)}
+function openBookExp(){var B=bgeo(),empty=0,nf=bookFlip(B);S.panels.forEach(function(p,i){if(!isCovered(i)&&isEmpty(p))empty++});
+  $('#exp-summary').textContent='Stapled booklet · '+sizeLabel()+' · '+B.N+' pages on '+B.sheets+' sheet'+(B.sheets>1?'s':'')+' · page '+fmt(B.RW)+' × '+fmt(B.RH)+' mm'+(empty?' · '+empty+' page'+(empty>1?'s are':' is')+' still empty':'');
+  $('#e-printhint').textContent='Print PDF pages 1–'+(2*B.sheets)+' two-sided at 100% (Actual size), flipping on the '+nf+' edge. Turn off “Fit to page” and any “Booklet” option in the print dialog: the pages are already in booklet order.'+($('#e-guide').checked?' The last page holds the instructions; print it on its own.':'');
+  $('#e-ticks-l').textContent='Fold marks, alignment crosshairs and sheet numbers in the margin';$('#e-guide-l').textContent='Add a page with folding and stapling instructions';
+  $('#e-testhint').textContent='Prints big page numbers and a “top” arrow instead of your photos. Fold and nest a plain-paper copy to check the page order and that the backs land the right way up.';
+  $('#exp-msg').textContent='';$('#exp').hidden=false;$('#expGo').focus()}
+function exportBook(){var msg=$('#exp-msg'),B=bgeo(),dpi=+$('#e-dpi').value,ppm=dpi/25.4,MAX=16e6,note='';
+  if(B.W*ppm*B.H*ppm>MAX){ppm=Math.sqrt(MAX/(B.W*B.H));dpi=Math.floor(ppm*25.4);ppm=dpi/25.4;note=' Rendered at '+dpi+' dpi, the most this browser can handle for this size.'}
+  var test=$('#e-test').checked,SH=impose(B),orient=B.W>B.H?'l':'p',doc=new window.jspdf.jsPDF({unit:'mm',format:[B.W,B.H],orientation:orient,compress:true}),turnBack=bookFlip(B)!==naturalFlip(B),bx=+S.sheet.boffx||0,by=+S.sheet.boffy||0,first=true;
+  SH.forEach(function(sh,s){['front','back'].forEach(function(sd){if(!first)doc.addPage([B.W,B.H],orient);first=false;var c=document.createElement('canvas');c.width=Math.round(B.W*ppm);c.height=Math.round(B.H*ppm);var x=c.getContext('2d');
+    if(sd==='back'&&turnBack){x.translate(c.width,c.height);x.rotate(Math.PI)}drawBookSheet(x,ppm,B,sh[sd],{test:test});var d=c.toDataURL('image/jpeg',0.93);c.width=c.height=1;
+    var ox=sd==='back'?bx:0,oy=sd==='back'?by:0;doc.addImage(d,'JPEG',ox,oy,B.W,B.H,undefined,'FAST');bookMarks(doc,B,s,sd,ox,oy,sh[sd],turnBack&&sd==='back')})});
+  if($('#e-guide').checked){doc.addPage([B.W,B.H],orient);bookGuidePage(doc,B)}
+  var blob=doc.output('blob'),name='skylux-booklet-'+(test?'TEST-':'')+sizeLabel()+'-'+B.N+'p'+(B.land?'-landscape':'')+'.pdf';msg.textContent='Ready ('+(blob.size/1048576).toFixed(1)+' MB). Confirm the download.'+note;
+  return saveFile(name,blob).then(function(){msg.textContent='Saved '+name+'.'+note;toast('PDF saved. Print pages 1–'+(2*B.sheets)+' two-sided, flip on the '+bookFlip(B)+' edge, at 100%.')})}
+function bookMarks(doc,B,s,sd,ox,oy,slots,turned){function ln(a,b,c,d){doc.line(a+ox,b+oy,c+ox,d+oy)}var m=B.m,W=B.W,H=B.H,L=Math.max(0,Math.min(m-1.5,5));doc.setLineDashPattern([],0);
+  if($('#e-ticks').checked){if(L>=1.5){doc.setDrawColor(25,113,194);doc.setLineWidth(0.15);ln(W/2,m-1-L,W/2,m-1);ln(W/2,H-m+1,W/2,H-m+1+L);if(B.twice){ln(m-1-L,H/2,m-1,H/2);ln(W-m+1,H/2,W-m+1+L,H/2)}}
+    if(m>=3){doc.setDrawColor(40);doc.setLineWidth(0.15);var cr=Math.min(1.4,m/2-0.4);[[W*0.25,m/2],[W*0.75,m/2],[W*0.25,H-m/2],[W*0.75,H-m/2]].forEach(function(c){doc.circle(c[0]+ox,c[1]+oy,cr,'S');ln(c[0]-cr-0.8,c[1],c[0]+cr+0.8,c[1]);ln(c[0],c[1]-cr-0.8,c[0],c[1]+cr+0.8)})}
+    if(m>=3.5){var by=turned?m/2:H-m/2,ns=slots.map(function(q){return q.n});doc.setFont('helvetica','normal');doc.setFontSize(5.5);doc.setTextColor(120);
+      doc.text('Sheet '+(s+1)+' of '+B.sheets+' - '+(sd==='front'?'front':'back')+' - pages '+ns.join(', ')+(s===0&&sd==='front'?' - outside':''),W*0.25+3+ox,by+0.7+oy)}}
+  if($('#e-staple').checked&&s===0&&sd==='front'){doc.setDrawColor(150);doc.setLineWidth(0.25);var y0=B.twice?B.ch:0,len=B.twice?B.ch:B.H;[0.25,0.75].forEach(function(f){var y=y0+len*f;ln(W/2,y-2,W/2,y+2)})}}
+function bookSheetsText(B){var SH=impose(B);return SH.map(function(sh,s){function names(a){return a.map(function(q){return q.n+(q.rot?' (upside down)':'')}).join(' | ')}
+  return 'Sheet '+(s+1)+': front '+names(sh.front)+', back '+names(sh.back)})}
+function bookSteps(B){var N=B.N,nf=bookFlip(B),land=B.land,staple=(B.twice?'Open the folded sheet flat with pages 8 and 1 facing up and lay it on a piece of cardboard. Push two staples':'Open the booklet flat at the middle pages ('+(N/2)+' and '+(N/2+1)+') and lay it on a piece of cardboard with the outside facing up. Push two staples')+' straight through the fold, about a quarter of the way in from each end (the small marks on the cover show where). Lift it off, and press the staple legs flat on the inside with your thumb or a spoon. A long-reach stapler does the same in one step.';
+  var steps=[{t:'Print',b:'Print PDF pages 1–'+(2*B.sheets)+' two-sided, flipping on the '+nf+' edge, at 100% (Actual size), on '+sizeLabel()+' paper. Turn off “Fit to page” and the print dialog’s own “Booklet” option. Without automatic two-sided printing, print the odd pages, put the stack back in the tray, and print the even pages; a test sheet shows which way to reload. Try one copy on plain paper first.'},
+    {t:'Check the backs',b:'Hold a sheet against a window. The crosshairs in the margins of the front and back should sit on top of each other; if not, shift the back in the Sheet settings and print again.'}];
+  if(B.twice){steps.push({t:'First fold',b:'Lay the sheet front side up with pages 8 and 1 along the bottom. Fold the top half back behind the bottom half, along the middle line (blue marks at the sides), so pages 8 and 1 stay facing you. Crease it with a bone folder.'},
+    {t:'Second fold',b:'Fold it in half again along the vertical middle (blue marks at the top and bottom), so page 1 ends up on the front as the cover. This fold is the spine.'},
+    {t:'Staple',b:staple},
+    {t:'Trim the top open',b:'The pages are still joined along the top edge, where the first fold is. With a metal ruler and a craft knife, cut 2–3 mm off that folded edge so the pages can turn. Trim the outer edge too if the inner pages stick out.'})}
+  else{steps.push({t:'Fold each sheet',b:'Fold every sheet in half along its middle, using the blue marks in the top and bottom margins, with the sheet front facing out. Crease each one firmly with a bone folder.'});
+    if(B.sheets>1)steps.push({t:'Nest the sheets',b:'Tuck sheet 2 inside sheet 1, sheet 3 inside sheet 2, and so on (the sheet number is printed in the bottom margin). Sheet 1 is the outside, with pages '+N+' and 1. Flip through: the pages should run 1 to '+N+'.'});
+    steps.push({t:'Staple',b:staple});
+    steps.push({t:'Trim',b:B.sheets>1?'The inner sheets stick out a little at the outer edge. With a ruler and craft knife, trim a few millimetres off that edge through all pages for a clean finish. The layout already moved the inner pages up to '+fmt(maxCreep(B))+' mm toward the spine to allow for this.':'Trim the outer edge if you want a cleaner finish.'})}
+  steps.push({t:'Press',b:'Press the booklet under a heavy book for a few minutes.'+(land?' Read it with the spine at the top: pages flip up, like a calendar.':'')});
+  return steps}
+function bookTools(){return ['Bone folder (or an empty ballpoint pen)','Stapler, plus a piece of cardboard (or a long-reach stapler)','Metal ruler and craft knife, for trimming','Cutting mat']}
+function bookGuidePage(doc,B){var pad=Math.max(10,Math.min(16,B.W*0.05)),maxW=B.W-2*pad,y=pad+6,small=B.W<230;doc.setTextColor(20,32,26);
+  doc.setFont('helvetica','bold');doc.setFontSize(small?16:20);doc.text('How to fold and staple',pad,y);y+=6;
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.text(sizeLabel()+'  |  '+B.N+' pages on '+B.sheets+' sheet'+(B.sheets>1?'s':'')+'  |  page '+fmt(B.RW)+' x '+fmt(B.RH)+' mm  |  spine on the '+(B.land?'top':'left'),pad,y);y+=7;
+  doc.setFontSize(8.5);doc.setTextColor(80);var st=bookSheetsText(B),cols=st.length>6?2:1,colW=maxW/cols,rowsN=Math.ceil(st.length/cols);
+  st.forEach(function(t,k){var c=Math.floor(k/rowsN),r=k%rowsN;doc.text(t,pad+c*colW,y+r*4)});y+=rowsN*4+5;doc.setTextColor(20,32,26);
+  var steps=bookSteps(B).map(function(s,i){return (i+1)+'.  '+s.t+'. '+s.b.replace(/[–—]/g,'-').replace(/×/g,'x').replace(/[“”]/g,'"').replace(/’/g,"'")});
+  doc.setFontSize(small?8.5:9.5);steps.forEach(function(s){var lines=doc.splitTextToSize(s,maxW);if(y+lines.length*4.6>B.H-pad)return;doc.text(lines,pad,y);y+=lines.length*(small?4.1:4.6)+2})}
+function drawBookDiagram(cv2){var B=bgeo(),sh=impose(B)[0],box=cv2.parentElement,maxW=Math.min(620,box.clientWidth),gap=18,k=Math.min((maxW-gap)/(2*B.W),300/B.H),dpr=Math.min(2,window.devicePixelRatio||1),W=2*B.W*k+gap,H=B.H*k+22;
+  cv2.style.width=W+'px';cv2.style.height=H+'px';cv2.width=Math.round(W*dpr);cv2.height=Math.round(H*dpr);var x=cv2.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+  ['front','back'].forEach(function(sd,j){var ox=j*(B.W*k+gap),oy=20;x.fillStyle='#14201a';x.font='600 12px "Instrument Sans", Arial, sans-serif';x.textAlign='left';x.textBaseline='alphabetic';
+    x.fillText('Sheet 1 '+(sd==='front'?'front (outside)':'back, turned over sideways'),ox,13);x.fillStyle='#ffffff';x.fillRect(ox,oy,B.W*k,B.H*k);x.strokeStyle='#9aa79f';x.lineWidth=1;x.strokeRect(ox+0.5,oy+0.5,B.W*k-1,B.H*k-1);
+    sh[sd].forEach(function(sl){var cx=ox+(sl.x+B.cw/2)*k,cy=oy+(sl.y+B.ch/2)*k;x.fillStyle=sl.n===1?'#e6f2ec':'#f1f5f3';x.fillRect(ox+sl.x*k+2,oy+sl.y*k+2,B.cw*k-4,B.ch*k-4);
+      x.save();x.translate(cx,cy);x.rotate((sl.rot?Math.PI:0)+(B.land?-Math.PI/2:0));x.fillStyle='#14201a';x.textAlign='center';x.textBaseline='middle';x.font='700 '+Math.max(12,Math.min(30,Math.min(B.cw,B.ch)*k*0.3))+'px "Bricolage Grotesque", Arial, sans-serif';x.fillText(String(sl.n),0,0);
+      x.font='600 9px "Instrument Sans", Arial, sans-serif';x.fillText('▲ top',0,-Math.min(B.RH,B.RW)*k*0.3);x.restore()});
+    x.strokeStyle='#1971c2';x.lineWidth=1.5;x.setLineDash([5,4]);x.beginPath();x.moveTo(ox+B.W/2*k,oy);x.lineTo(ox+B.W/2*k,oy+B.H*k);if(B.twice){x.moveTo(ox,oy+B.H/2*k);x.lineTo(ox+B.W*k,oy+B.H/2*k)}x.stroke();x.setLineDash([]);
+    if(sd==='front'){x.fillStyle='#d6336c';var y0=B.twice?B.ch:0,len=B.twice?B.ch:B.H;[0.25,0.75].forEach(function(f){x.beginPath();x.arc(ox+B.W/2*k,oy+(y0+len*f)*k,3,0,Math.PI*2);x.fill()})}})}
+function openBookGuide(){var B=bgeo();$('#gd-h').textContent='How to fold and staple';$('#gd-sub').textContent='Stapled booklet · '+sizeLabel()+' · '+B.N+' pages on '+B.sheets+' sheet'+(B.sheets>1?'s':'')+' · page '+fmt(B.RW)+' × '+fmt(B.RH)+' mm';
+  $('#gd-tools').innerHTML=bookTools().map(function(t){return '<li>'+esc(t)+'</li>'}).join('');
+  var st=bookSheetsText(B);$('#gd-steps').innerHTML=bookSteps(B).map(function(s){return '<li><strong>'+esc(s.t)+'.</strong> '+esc(s.b)+'</li>'}).join('')+'<li><strong>Page order on the sheets.</strong> '+esc(st.join('; '))+'. Blue dashes: folds. Pink dots: staples.</li>';
+  $('#guide').hidden=false;drawBookDiagram($('#gd-cv'));$('#gd-close').focus()}
+
 /* ---------- start page ---------- */
 function showEditor(){document.body.classList.add('editor-on');window.scrollTo(0,0);requestAnimationFrame(function(){draw()})}
 function showLanding(){document.body.classList.remove('editor-on');refreshLanding();window.scrollTo(0,0)}
 function placedCount(){var n=0;bothSides(function(a){a.forEach(function(p){if(p.photo)n++})});return n}
 function refreshLanding(){var has=hasWork();$('#ld-continue').hidden=!has;
-  if(has){var g=geo(),pc=placedCount();$('#ld-cont-info').textContent=(current.name||'Untitled zine')+' · '+sizeLabel()+' · '+(g.cols*g.rows)+' pages'+(duplex()?', both sides':'')+' · '+pc+' photo'+(pc===1?'':'s')+' placed · '+(current.id?'saved to your projects':'draft in this browser')}
+  if(has){var g=geo(),pc=placedCount();$('#ld-cont-info').textContent=(current.name||'Untitled zine')+' · '+(isBook()?'stapled booklet · ':'')+sizeLabel()+' · '+(g.cols*g.rows)+' pages'+(duplex()?', both sides':'')+' · '+pc+' photo'+(pc===1?'':'s')+' placed · '+(current.id?'saved to your projects':'draft in this browser')}
   var b=$('#ld-new');b.dataset.armed='';b.textContent='Start laying out';$('#ld-msg').textContent='You can change all of this later in the editor.';
   cloudReady.then(function(){var ok=cloudOK();$('#ld-projects').hidden=!ok;$('#ld-open-note').textContent=ok?'Open a zine you saved to your projects, or a project file you downloaded.':'Open a project file you downloaded earlier.'})}
 $('#ld-new').addEventListener('click',function(e){var b=e.currentTarget;
   if(hasWork()&&!current.id&&b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Start anyway';$('#ld-msg').textContent='Your current draft is not saved to your projects. Starting a new zine replaces it.';return}
+  if(ldFmt()==='booklet'){var o=ldBook(),bsheet=Object.assign(defSheet(),{size:$('#ld-size').value,format:'booklet',bk:Object.assign(defBk(),{fold:o.fold,pages:o.pages,shape:o.shape})});
+    loadProject({sheet:bsheet,panels:[],images:{}},{id:null,name:''});showEditor();toast('New '+nPages()+'-page stapled booklet on '+sizeLabel()+'. Add photos to start.');return}
   var lay=($('input[name=ld-layout]:checked')||{value:'3x6'}).value.split('x'),sheet=Object.assign(defSheet(),{size:$('#ld-size').value,cols:+lay[0],rows:+lay[1],duplex:$('#ld-duplex').checked,dir:($('input[name=ld-dir]:checked')||{value:'rows'}).value});
   loadProject({sheet:sheet,panels:[],images:{}},{id:null,name:''});showEditor();toast('New '+(+lay[0]*+lay[1])+'-page zine on '+sizeLabel()+'. Add photos to start.')});
 $('#ld-cont').addEventListener('click',showEditor);
+function ldFmt(){return ($('input[name=ld-fmt]:checked')||{value:'maze'}).value}
+function ldBook(){return {fold:($('input[name=ld-fold]:checked')||{value:'once'}).value,pages:+$('#ld-pages').value||16,shape:($('input[name=ld-shape]:checked')||{value:'portrait'}).value}}
+function ldSync(){var bkOn=ldFmt()==='booklet';$('.ld-maze').hidden=bkOn;$('.ld-book').hidden=!bkOn;if(!bkOn)return;var o=ldBook(),tw=o.fold==='twice',B=bdims(paperSL($('#ld-size').value),tw,o.shape==='landscape',tw?8:o.pages,'plain');
+  $('#ld-pages-f').hidden=tw;$('#ld-bkinfo').textContent=B.N+' pages, each '+fmt(B.RW)+' × '+fmt(B.RH)+' mm, on '+B.sheets+' sheet'+(B.sheets>1?'s':'')+' printed on both sides'+(B.land?', spine on the top edge so pages flip up':', spine on the left')+'. Needs a stapler.'}
+pagesOptions($('#ld-pages'),16);
+$$('input[name=ld-fmt],input[name=ld-fold],input[name=ld-shape]').forEach(function(r){r.addEventListener('change',ldSync)});$('#ld-pages').addEventListener('change',ldSync);$('#ld-size').addEventListener('change',ldSync);ldSync();
 $('#ld-projects').addEventListener('click',function(){cloudReady.then(openProj)});
 $('#homeBtn').addEventListener('click',showLanding);
 
