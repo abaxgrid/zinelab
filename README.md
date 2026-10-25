@@ -9,10 +9,11 @@ Everything runs in a single file, `index.html`. There is no build step and no se
 - **Sheet setup**: A3, Legal, Letter, A4, Tabloid, A2 or a custom size, portrait or landscape. Choose the number of strips (columns) and pages per strip (rows), the paper margin and the white border around photos.
 - **Photos**: drop in JPG, PNG or WebP files, drag them onto pages, drag one page onto another to swap them, or fill empty pages in reading order. Each page shows whether its photo has enough resolution to print sharply.
 - **Per-page styling**: background color, patterns (checks, stripes, dots, grid), vignette strength and color, black and white, zoom and crop position, and text with font, size, color, alignment and rotation.
-- **Cut and fold guides**: the sheet shows cut slits, valley and mountain folds, and page numbers in reading order. A guide panel lists the tools and steps for the current layout.
+- **Cut and fold guides**: the sheet shows cut slits, valley and mountain folds, and page numbers in reading order. A guide panel lists the tools and steps for the current layout: fold the rows across the whole sheet first, then cut the slits, then refold.
+- **Two-sided printing**: optional back side for every page, laid out mirrored for long-edge or short-edge duplex printing.
 - **Flip-through preview**: read the zine as spreads or single pages, with an option to show pages as they turn out after folding.
-- **Print-ready PDF**: export at 150, 200 or 300 dpi with optional cut lines, fold and trim marks, and a second page of cutting and folding instructions.
-- **Projects**: save a project file (`.json`, photos included) and open it later. A draft is also kept in the browser.
+- **Print-ready PDF**: export at 150, 200 or 300 dpi with optional cut lines, fold and trim marks, the back side when printing two-sided, and a page of cutting and folding instructions. A test-sheet option prints page numbers and a "top" arrow on every page, to check order and orientation on plain paper first.
+- **Projects**: inside claude.ai, named projects save with their photos and autosave as you work. Anywhere else, download the project as a `.json` file (photos included) and open it later. A draft is also kept in the browser.
 
 ## Use it
 
