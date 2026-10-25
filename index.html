@@ -120,6 +120,13 @@ input[type=range]{width:100%;accent-color:var(--accent);margin:0}
 .modal .card{width:min(460px,100%);max-height:100%;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.35)}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:6px;font-size:13px;z-index:50;max-width:calc(100% - 32px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .modal .card.guide-card{width:min(760px,100%)}
+.modal .card.ai-card{width:min(620px,100%)}
+.ai-sugg{display:flex;flex-direction:column;gap:8px}
+.ai-item{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px}
+.ai-item .sw-prev{height:52px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;padding:4px;text-align:center;overflow:hidden;line-height:1.15}
+.ai-item .t{font-size:13.5px;min-width:0;overflow-wrap:anywhere}
+.ai-item.added{opacity:.55}
+@media (max-width:480px){.ai-item{grid-template-columns:80px minmax(0,1fr)}.ai-item .btn{grid-column:1/-1}}
 /* Start page: shown until a zine is opened; the editor (header + workbench) shows only with body.editor-on. */
 body:not(.editor-on) .app>.top,body:not(.editor-on) .work{display:none}
 body.editor-on .landing{display:none}
@@ -189,6 +196,8 @@ body.editor-on .landing{display:none}
 .slot.l.filled::after,.slot.r.filled::after{content:"";position:absolute;inset:0;pointer-events:none}
 .slot.l.filled::after{background:linear-gradient(90deg,rgba(0,0,0,0) 82%,rgba(0,0,0,.2))}
 .slot.r.filled::after{background:linear-gradient(270deg,rgba(0,0,0,0) 82%,rgba(0,0,0,.2))}
+.book.vert .slot.l.filled::after{background:linear-gradient(180deg,rgba(0,0,0,0) 82%,rgba(0,0,0,.2))}
+.book.vert .slot.r.filled::after{background:linear-gradient(0deg,rgba(0,0,0,0) 82%,rgba(0,0,0,.2))}
 .leaf{transform-style:preserve-3d;z-index:5}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.4)}
 .face.back{transform:rotateY(180deg)}
@@ -243,11 +252,14 @@ body.editor-on .landing{display:none}
           </select>
         </label>
         <fieldset class="ld-layouts"><legend>Pages</legend>
-          <input type="radio" name="ld-layout" id="ly-8" value="2x4"><label for="ly-8"><b>8</b><span>2 strips × 4</span></label>
-          <input type="radio" name="ld-layout" id="ly-12" value="3x4"><label for="ly-12"><b>12</b><span>3 strips × 4</span></label>
-          <input type="radio" name="ld-layout" id="ly-18" value="3x6" checked><label for="ly-18"><b>18</b><span>3 strips × 6</span></label>
-          <input type="radio" name="ld-layout" id="ly-24" value="4x6"><label for="ly-24"><b>24</b><span>4 strips × 6</span></label>
+          <input type="radio" name="ld-layout" id="ly-8" value="2x4"><label for="ly-8"><b>8</b><span>2 across × 4 down</span></label>
+          <input type="radio" name="ld-layout" id="ly-12" value="3x4"><label for="ly-12"><b>12</b><span>3 across × 4 down</span></label>
+          <input type="radio" name="ld-layout" id="ly-18" value="3x6" checked><label for="ly-18"><b>18</b><span>3 across × 6 down</span></label>
+          <input type="radio" name="ld-layout" id="ly-24" value="4x6"><label for="ly-24"><b>24</b><span>4 across × 6 down</span></label>
         </fieldset>
+        <div class="row">Opens
+          <div class="seg" role="radiogroup" aria-label="Zine opens"><input type="radio" name="ld-dir" id="ldd-r" value="rows" checked><label for="ldd-r">Side to side, like a book</label><input type="radio" name="ld-dir" id="ldd-c" value="cols"><label for="ldd-c">Top to bottom, like a calendar</label></div>
+        </div>
         <label class="check"><input type="checkbox" id="ld-duplex">Print on both sides (needs double-sided paper)</label>
         <p class="hint" id="ld-msg" aria-live="polite">You can change all of this later in the editor.</p>
         <div class="btnrow"><button class="btn primary" id="ld-new" type="button">Start laying out</button></div>
@@ -320,9 +332,13 @@ body.editor-on .landing{display:none}
           </div>
         </div>
         <div class="grid2">
-          <label class="field">Columns (strips)<input id="s-cols" type="number" min="2" max="6" step="1"></label>
-          <label class="field">Rows (folds)<input id="s-rows" type="number" min="2" max="10" step="1"></label>
+          <label class="field">Columns<input id="s-cols" type="number" min="2" max="6" step="1"></label>
+          <label class="field">Rows<input id="s-rows" type="number" min="2" max="10" step="1"></label>
         </div>
+        <div class="row">Zine opens
+          <div class="seg" role="radiogroup" aria-label="Zine opens"><input type="radio" name="sdir" id="dir-r" value="rows"><label for="dir-r">Side to side</label><input type="radio" name="sdir" id="dir-c" value="cols"><label for="dir-c">Top to bottom</label></div>
+        </div>
+        <p class="hint" id="dirHint"></p>
         <div class="range"><label for="s-margin">Paper margin</label><input id="s-margin" type="range" min="0" max="20" step="0.5"><output id="o-margin"></output></div>
         <div class="range"><label for="s-border">White border</label><input id="s-border" type="range" min="0" max="20" step="0.5"><output id="o-border"></output></div>
         <p class="hint">Most home printers need a margin of at least 5 mm. The white border frames each photo, like the reel.</p>
@@ -348,6 +364,7 @@ body.editor-on .landing{display:none}
           <button class="btn small primary" id="fillEmpty" type="button">Auto-place photos</button>
           <button class="btn small" id="clearAll" type="button">Clear all pages</button>
         </div>
+        <button class="btn small" id="aiBtn" type="button" hidden>Captions and word pages with Claude</button>
       </section>
     </div>
 
@@ -408,11 +425,13 @@ body.editor-on .landing{display:none}
           <h3>Text</h3>
           <label class="field" for="p-text">Text on this page</label>
           <textarea id="p-text" data-prop="text" placeholder="Title, caption, date, a short note…"></textarea>
+          <div class="btnrow"><button class="btn small" id="aiPageBtn" type="button" hidden>Write a caption with Claude</button></div>
           <label class="field">Font
             <select id="p-font" data-prop="font"></select>
           </label>
           <div class="range"><label for="p-size">Size</label><input id="p-size" type="range" min="6" max="96" step="1" data-prop="size" data-num="1"><output data-for="size"></output></div>
           <div class="row">Color <div class="sw" data-sw="color"></div></div>
+          <label class="check"><input type="checkbox" id="p-shadow" data-prop="shadow">Text shadow (easier to read on photos)</label>
           <div class="row">Align
             <div class="seg"><input type="radio" name="al" id="al-l" value="left" data-prop="align"><label for="al-l">Left</label><input type="radio" name="al" id="al-c" value="center" data-prop="align"><label for="al-c">Center</label><input type="radio" name="al" id="al-r" value="right" data-prop="align"><label for="al-r">Right</label></div>
           </div>
@@ -453,6 +472,34 @@ body.editor-on .landing{display:none}
       <button class="btn" id="expCancel" type="button">Cancel</button>
       <button class="btn primary" id="expGo" type="button">Make PDF</button>
     </div>
+  </div>
+</div>
+<div class="modal" id="ai" hidden role="dialog" aria-modal="true" aria-labelledby="ai-h">
+  <div class="card ai-card">
+    <div class="ins-head"><h2 id="ai-h">Captions and word pages</h2><button class="btn small" id="ai-close" type="button">Close</button></div>
+    <p class="hint">Claude looks at your photos and writes captions for them, or suggests words and short phrases for text pages between them. It uses your Claude usage, and asks you to allow it the first time.</p>
+    <div class="grid2">
+      <label class="field">Language<select id="ai-lang"><option value="English">English</option><option value="Spanish">Español</option></select></label>
+      <label class="field">Tone<select id="ai-tone"><option value="short">Short and plain</option><option value="descriptive">Descriptive</option><option value="poetic">Poetic</option><option value="documentary">Documentary</option></select></label>
+    </div>
+    <label class="field">About these photos (optional)<input type="text" id="ai-context" maxlength="300" placeholder="e.g. A day trip to El Valle de Antón, Panama, August 2026"></label>
+    <section class="group" aria-label="Captions">
+      <h3>Captions</h3>
+      <div class="row">Write captions for
+        <div class="seg" role="radiogroup" aria-label="Write captions for"><input type="radio" name="aiscope" id="as-page" value="page"><label for="as-page">This page</label><input type="radio" name="aiscope" id="as-side" value="side" checked><label for="as-side" id="as-side-l">All photo pages</label><input type="radio" name="aiscope" id="as-both" value="both"><label for="as-both" id="as-both-l">Both sides</label></div>
+      </div>
+      <label class="check"><input type="checkbox" id="ai-keep" checked>Skip pages that already have text</label>
+      <p class="hint">Captions go at the bottom of each photo in small white type with a soft shadow. Edit or restyle any of them in the page settings.</p>
+      <div class="btnrow"><button class="btn primary" id="ai-cap" type="button">Write captions</button></div>
+    </section>
+    <section class="group" aria-label="Word pages">
+      <h3>Word pages</h3>
+      <div class="row">Suggestions <input type="number" id="ai-n" min="1" max="8" value="4" style="width:72px" aria-label="Number of suggestions"></div>
+      <div class="btnrow"><button class="btn primary" id="ai-words" type="button">Suggest words</button></div>
+      <div class="ai-sugg" id="ai-sugg"></div>
+    </section>
+    <p class="hint" id="ai-msg" aria-live="polite"></p>
+    <div class="btnrow" style="justify-content:flex-end"><button class="btn" id="ai-stop" type="button" hidden>Stop</button></div>
   </div>
 </div>
 <div class="modal" id="proj" hidden role="dialog" aria-modal="true" aria-labelledby="pj-h">
@@ -528,8 +575,8 @@ var FONTS={
 function fontCss(key,px){var f=FONTS[key]||FONTS.sans;return f.weight+' '+px+'px '+f.family+', '+f.fb}
 var SWATCHES=['#ffffff','#111111','#e03131','#f76707','#fcc419','#f06595','#9c36b5','#7048e8','#1c7ed6','#22b8cf','#37b24d','#a9e34b'];
 
-function blankPanel(){return {bg:'#ffffff',pattern:'none',pc:'#111111',ps:8,photo:null,fit:'cover',zoom:1,fx:50,fy:50,border:null,bw:false,vig:0,vc:'#000000',text:'',font:'sans',size:14,color:'#111111',align:'left',valign:'top',rot:0}}
-function defSheet(){return {size:'A3',orient:'portrait',cw:300,ch:400,cols:3,rows:6,margin:6,border:4,duplex:false,flip:'long'}}
+function blankPanel(){return {bg:'#ffffff',pattern:'none',pc:'#111111',ps:8,photo:null,fit:'cover',zoom:1,fx:50,fy:50,border:null,bw:false,vig:0,vc:'#000000',text:'',font:'sans',size:14,color:'#111111',align:'left',valign:'top',rot:0,shadow:false}}
+function defSheet(){return {size:'A3',orient:'portrait',cw:300,ch:400,cols:3,rows:6,margin:6,border:4,duplex:false,flip:'long',dir:'rows'}}
 
 var S={sheet:defSheet(),panels:[]};
 var images={};            // id -> {name,src,w,h,sample}
@@ -543,13 +590,18 @@ function sheetDims(){var w,h,d=SIZES[S.sheet.size];if(S.sheet.size==='Custom'||!
   var s=Math.min(w,h),l=Math.max(w,h);return S.sheet.orient==='landscape'?[l,s]:[s,l]}
 function geo(){var d=sheetDims(),W=d[0],H=d[1],m=+S.sheet.margin,cols=S.sheet.cols,rows=S.sheet.rows;return {W:W,H:H,m:m,cols:cols,rows:rows,pw:(W-2*m)/cols,ph:(H-2*m)/rows}}
 function rectOf(i,g){var r=Math.floor(i/g.cols),c=i%g.cols;return {x:g.m+c*g.pw,y:g.m+r*g.ph,w:g.pw,h:g.ph,r:r,c:c}}
-function path(g){var out=[];for(var c=0;c<g.cols;c++){for(var k=0;k<g.rows;k++){var r=c%2===0?k:g.rows-1-k;out.push(r*g.cols+c)}}return out}
+/* Strip direction. 'cols': strips run down the sheet, folds are horizontal, the zine flips up and down like a calendar.
+   'rows': strips run across the sheet, folds are vertical, the zine turns side to side like a book. */
+function byRows(){return S.sheet.dir==='rows'}
+function path(g){var out=[],k,r,c;if(byRows()){for(r=0;r<g.rows;r++)for(k=0;k<g.cols;k++){c=r%2===0?k:g.cols-1-k;out.push(r*g.cols+c)}}
+  else{for(c=0;c<g.cols;c++)for(k=0;k<g.rows;k++){r=c%2===0?k:g.rows-1-k;out.push(r*g.cols+c)}}return out}
 function pageNumbers(g){var p=path(g),m=[];p.forEach(function(idx,k){m[idx]=k+1});return m}
-function cuts(g){var out=[];for(var c=0;c<g.cols-1;c++){var x=g.m+(c+1)*g.pw;if(c%2===0)out.push({x1:x,y1:g.m,x2:x,y2:g.m+(g.rows-1)*g.ph});else out.push({x1:x,y1:g.m+g.ph,x2:x,y2:g.H-g.m})}return out}
+function cuts(g){var out=[];if(byRows()){for(var r=0;r<g.rows-1;r++){var y=g.m+(r+1)*g.ph;if(r%2===0)out.push({x1:g.m,y1:y,x2:g.m+(g.cols-1)*g.pw,y2:y});else out.push({x1:g.m+g.pw,y1:y,x2:g.W-g.m,y2:y})}return out}
+  for(var c=0;c<g.cols-1;c++){var x=g.m+(c+1)*g.pw;if(c%2===0)out.push({x1:x,y1:g.m,x2:x,y2:g.m+(g.rows-1)*g.ph});else out.push({x1:x,y1:g.m+g.ph,x2:x,y2:g.H-g.m})}return out}
 /* The first fold is a mountain so page 1 stays on the outside as the cover; folds then alternate. */
 function folds(g){var p=path(g),out=[];for(var k=0;k<p.length-1;k++){var a=rectOf(p[k],g),b=rectOf(p[k+1],g),t=k%2===0?'M':'V';
-  if(a.c===b.c){var y=Math.max(a.y,b.y);out.push({x1:a.x,y1:y,x2:a.x+a.w,y2:y,type:t,dir:'h'})}
-  else{var x=Math.max(a.x,b.x);out.push({x1:x,y1:a.y,x2:x,y2:a.y+a.h,type:t,dir:'v',top:a.r===0})}}
+  if(a.c===b.c){var y=Math.max(a.y,b.y),tr=byRows();out.push({x1:a.x,y1:y,x2:a.x+a.w,y2:y,type:t,dir:'h',turn:tr,end:tr?(a.c===0?'left':'right'):null})}
+  else{var x=Math.max(a.x,b.x),tc=!byRows();out.push({x1:x,y1:a.y,x2:x,y2:a.y+a.h,type:t,dir:'v',turn:tc,end:tc?(a.r===0?'top':'bottom'):null})}}
   return out}
 /* ---------- two-sided printing ----------
    S.back[i] is what prints on the back of front page i. On the printed back side it sits at the mirrored
@@ -561,7 +613,7 @@ function A(){return side==='back'&&duplex()?backArr():S.panels}
 function mirrorCols(){var land=S.sheet.orient==='landscape',lng=S.sheet.flip!=='short';return land?!lng:lng}
 function mirrorIdx(i,g){var r=Math.floor(i/g.cols),c=i%g.cols;return mirrorCols()?r*g.cols+(g.cols-1-c):(g.rows-1-r)*g.cols+c}
 function physOf(i,g,sd){return sd==='back'?mirrorIdx(i,g):i}
-function mirrorLine(l,g){var o=Object.assign({},l);if(mirrorCols()){o.x1=g.W-l.x1;o.x2=g.W-l.x2}else{o.y1=g.H-l.y1;o.y2=g.H-l.y2;if('top' in l)o.top=!l.top}if(o.type)o.type=o.type==='M'?'V':'M';return o}
+function mirrorLine(l,g){var o=Object.assign({},l),SW={left:'right',right:'left',top:'bottom',bottom:'top'};if(mirrorCols()){o.x1=g.W-l.x1;o.x2=g.W-l.x2;if(l.end==='left'||l.end==='right')o.end=SW[l.end]}else{o.y1=g.H-l.y1;o.y2=g.H-l.y2;if(l.end==='top'||l.end==='bottom')o.end=SW[l.end]}if(o.type)o.type=o.type==='M'?'V':'M';return o}
 function sideLines(fn,g,sd){var ls=fn(g);return sd==='back'?ls.map(function(l){return mirrorLine(l,g)}):ls}
 function outsideBack(g){var n=g.cols*g.rows;return {side:(n-2)%2===0?'front':'back',page:n}}
 function pageLabel(i,g,sd){var n=g.cols*g.rows,num=pageNumbers(g)[i],ob=outsideBack(g);
@@ -586,7 +638,7 @@ function drawPattern(ctx,p,x,y,w,h,sc){var s=Math.max(1,+p.ps)*sc,i,j,xx,yy;ctx.
   else if(p.pattern==='dots'){var r=s*0.28;for(yy=s/2;yy<h+s;yy+=s)for(xx=s/2;xx<w+s;xx+=s){ctx.beginPath();ctx.arc(x+xx,y+yy,r,0,Math.PI*2);ctx.fill()}}
   else if(p.pattern==='grid'){ctx.lineWidth=Math.max(1,0.35*sc);for(xx=0;xx<=w;xx+=s){ctx.beginPath();ctx.moveTo(x+xx,y);ctx.lineTo(x+xx,y+h);ctx.stroke()}for(yy=0;yy<=h;yy+=s){ctx.beginPath();ctx.moveTo(x,y+yy);ctx.lineTo(x+w,y+yy);ctx.stroke()}}}
 function drawText(ctx,p,x,y,w,h,sc){var pad=Math.max(3,bOf(p))*sc,px=(+p.size)/72*25.4*sc;ctx.save();ctx.translate(x+w/2,y+h/2);ctx.rotate((+p.rot)*Math.PI/180);
-  var bw=w,bh=h;if((+p.rot)%180!==0){bw=h;bh=w}var iw=Math.max(4,bw-2*pad);ctx.font=fontCss(p.font,px);ctx.fillStyle=p.color;ctx.textBaseline='alphabetic';
+  var bw=w,bh=h;if((+p.rot)%180!==0){bw=h;bh=w}var iw=Math.max(4,bw-2*pad);ctx.font=fontCss(p.font,px);ctx.fillStyle=p.color;ctx.textBaseline='alphabetic';if(p.shadow){ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=Math.max(1,0.7*sc);ctx.shadowOffsetY=Math.max(0.5,0.15*sc)}
   var lines=wrapLines(ctx,p.text,iw),lh=px*1.16,total=lines.length*lh,ty=p.valign==='top'?-bh/2+pad:p.valign==='bottom'?bh/2-pad-total:-total/2;
   lines.forEach(function(ln,k){var tw=ctx.measureText(ln).width,tx=p.align==='left'?-bw/2+pad:p.align==='right'?bw/2-pad-tw:-tw/2;ctx.fillText(ln,tx,ty+k*lh+px*0.86)});ctx.restore()}
 function drawPanel(ctx,p,R,sc){var x=R.x*sc,y=R.y*sc,w=R.w*sc,h=R.h*sc;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
@@ -698,6 +750,7 @@ function updOutputs(){var p=A()[selected];$$('output[data-for]',$('#insp')).forE
 function syncSheetUI(){var s=S.sheet;$('#s-size').value=s.size;$('#customFields').hidden=s.size!=='Custom';$('#s-cw').value=s.cw;$('#s-ch').value=s.ch;
   $('#o-p').checked=s.orient==='portrait';$('#o-l').checked=s.orient==='landscape';$('#s-cols').value=s.cols;$('#s-rows').value=s.rows;
   $('#s-margin').value=s.margin;$('#o-margin').textContent=fmt(s.margin)+' mm';$('#s-border').value=s.border;$('#o-border').textContent=fmt(s.border)+' mm';
+  $('#dir-r').checked=s.dir==='rows';$('#dir-c').checked=s.dir!=='rows';$('#dirHint').textContent=s.dir==='rows'?'Strips run across the sheet and fold on vertical lines, so pages turn sideways like a book.':'Strips run down the sheet and fold on horizontal lines, so pages flip up like a calendar.';
   $('#s-duplex').checked=!!s.duplex;$('#duplexFields').hidden=!s.duplex;$('#fl-l').checked=s.flip!=='short';$('#fl-s').checked=s.flip==='short'}
 function renderTray(){var u=usedPages(),ids=Object.keys(images),h='';
   ids.forEach(function(id){var m=images[id],used=u[id];h+='<div class="tray-item"><button type="button" class="thumb'+(armed===id?' armed':'')+'" draggable="true" data-id="'+id+'" title="'+esc(m.name)+'" aria-pressed="'+(armed===id)+'"><img src="'+m.src+'" alt="'+esc(m.name)+'">'+(used?'<span class="used">p.'+used.join(',')+'</span>':'')+'</button><button type="button" class="del" data-del="'+id+'" aria-label="Remove '+esc(m.name)+' from the tray">×</button></div>'});
@@ -721,6 +774,7 @@ $('#s-rows').addEventListener('change',function(e){var v=Math.min(10,Math.max(2,
 $('#v-guides').addEventListener('change',function(e){view.guides=e.target.checked;draw()});
 $('#s-duplex').addEventListener('change',function(e){S.sheet.duplex=e.target.checked;if(S.sheet.duplex)backArr();else side='front';$('#duplexFields').hidden=!S.sheet.duplex;commit();renderAll();
   if(S.sheet.duplex)toast('Two-sided on. Use Front side / Back side above the sheet to switch.')});
+$$('input[name=sdir]').forEach(function(r){r.addEventListener('change',function(){if(S.sheet.dir!==r.value){rebuildGrid(function(){S.sheet.dir=r.value});syncSheetUI();toast(r.value==='rows'?'Pages now turn side to side, like a book. Photos keep their reading order.':'Pages now flip top to bottom, like a calendar. Photos keep their reading order.')}})});
 $$('input[name=flip]').forEach(function(r){r.addEventListener('change',function(){S.sheet.flip=r.value;commit();renderAll()})});
 $$('input[name=side]').forEach(function(r){r.addEventListener('change',function(){side=r.value;renderAll()})});
 $('#v-numbers').addEventListener('change',function(e){view.numbers=e.target.checked;draw()});
@@ -778,7 +832,7 @@ $('#undo').addEventListener('click',undo);$('#redo').addEventListener('click',re
 document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();$('#saveCloudBtn').click();return}
   if(!$('#viewer').hidden){if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();vwFlip(1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();vwFlip(-1)}else if(e.key==='Escape')vwClose();return}
   var tag=(e.target.tagName||'').toLowerCase();if(tag==='textarea'||(tag==='input'&&!/^(range|radio|checkbox|color)$/.test(e.target.type)))return;
-  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo()}if(e.key==='Escape'){if(!$('#proj').hidden)closeProj();if(!$('#guide').hidden)closeGuide();if(!$('#exp').hidden)closeExp();if(armed){armed=null;renderTray()}}});
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo()}if(e.key==='Escape'){if(!$('#ai').hidden)closeAI();if(!$('#proj').hidden)closeProj();if(!$('#guide').hidden)closeGuide();if(!$('#exp').hidden)closeExp();if(armed){armed=null;renderTray()}}});
 var tt=null;function toast(m){var t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},3600)}
 
 var dlReady=(window.claude&&typeof window.claude.use==='function')?window.claude.use('downloads').catch(function(){return null}):Promise.resolve(null);
@@ -789,7 +843,7 @@ function saveErr(e){var c=e&&e.code;if(c==='declined')return 'Download cancelled
 $('#openFile').addEventListener('change',function(e){var f=e.target.files[0];e.target.value='';if(!f)return;var r=new FileReader();r.onload=function(){try{var o=JSON.parse(r.result);if(!o||!o.sheet||!Array.isArray(o.panels))throw 0;
     loadProject(o,{id:null,name:String(f.name).replace(/\.json$/i,'').replace(/^skylux-zine-project$/,'')});closeProj();showEditor();toast('Opened '+f.name+'. Save it to keep it in your projects.')}catch(_){toast('That file is not a Skylux Zine Lab project.')}};r.readAsText(f)});
 function loadProject(o,meta){loading=true;images={};IMG.clear();Object.keys(o.images||{}).forEach(function(id){var m=o.images[id];if(!m)return;m=Object.assign({},m);if(!m.src&&m.asset)m.src='/_blob/'+m.asset;if(m.src)addImage(id,m)});
-  S.sheet=Object.assign(defSheet(),o.sheet);var n=S.sheet.cols*S.sheet.rows;S.panels=[];for(var i=0;i<n;i++)S.panels.push(Object.assign(blankPanel(),o.panels[i]||{}));
+  S.sheet=Object.assign(defSheet(),o.sheet);if(!o.sheet||!o.sheet.dir)S.sheet.dir='cols';var n=S.sheet.cols*S.sheet.rows;S.panels=[];for(var i=0;i<n;i++)S.panels.push(Object.assign(blankPanel(),o.panels[i]||{}));
   S.back=Array.isArray(o.back)?S.panels.map(function(_,j){return Object.assign(blankPanel(),o.back[j]||{})}):null;side='front';
   selected=0;armed=null;current=meta||{id:null,name:''};dirty=false;clearTimeout(cloudTimer);syncSheetUI();hist=[];hi=-1;commit();renderAll();updUndo();updProjUI();loading=false;
   idbSet('project',projectObj())}
@@ -890,8 +944,10 @@ $('#expGo').addEventListener('click',function(){var btn=$('#expGo'),msg=$('#exp-
 function pdfMarks(doc,g,sd){var L=Math.max(0,Math.min(g.m-1.5,5));doc.setLineDashPattern([],0);
   if($('#e-ticks').checked&&L>=1.5){doc.setDrawColor(70);doc.setLineWidth(0.15);var m=g.m,W=g.W,H=g.H;
     [[m,m],[W-m,m],[m,H-m],[W-m,H-m]].forEach(function(pt){var x=pt[0],y=pt[1],sx=x<W/2?-1:1,sy=y<H/2?-1:1;doc.line(x+sx*1,y,x+sx*(1+L),y);doc.line(x,y+sy*1,x,y+sy*(1+L))});
-    doc.setDrawColor(25,113,194);var ys={};sideLines(folds,g,sd).forEach(function(f){if(f.dir==='h'){var k=fmt(f.y1);if(ys[k])return;ys[k]=1;doc.line(m-1-L,f.y1,m-1,f.y1);doc.line(W-m+1,f.y1,W-m+1+L,f.y1)}
-      else if(f.top)doc.line(f.x1,m-1-L,f.x1,m-1);else doc.line(f.x1,H-m+1,f.x1,H-m+1+L)})}
+    doc.setDrawColor(25,113,194);var seen={};sideLines(folds,g,sd).forEach(function(f){
+      if(f.turn){if(f.end==='top')doc.line(f.x1,m-1-L,f.x1,m-1);else if(f.end==='bottom')doc.line(f.x1,H-m+1,f.x1,H-m+1+L);else if(f.end==='left')doc.line(m-1-L,f.y1,m-1,f.y1);else doc.line(W-m+1,f.y1,W-m+1+L,f.y1);return}
+      if(f.dir==='h'){var k='h'+fmt(f.y1);if(seen[k])return;seen[k]=1;doc.line(m-1-L,f.y1,m-1,f.y1);doc.line(W-m+1,f.y1,W-m+1+L,f.y1)}
+      else{var k2='v'+fmt(f.x1);if(seen[k2])return;seen[k2]=1;doc.line(f.x1,m-1-L,f.x1,m-1);doc.line(f.x1,H-m+1,f.x1,H-m+1+L)}})}
   if($('#e-folds').checked){doc.setDrawColor(190);doc.setLineWidth(0.15);doc.setLineDashPattern([1.5,1.5],0);sideLines(folds,g,sd).forEach(function(f){doc.line(f.x1,f.y1,f.x2,f.y2)});doc.setLineDashPattern([],0)}
   if($('#e-cuts').checked&&sd!=='back'){doc.setDrawColor(60);doc.setLineWidth(0.2);cuts(g).forEach(function(l){doc.line(l.x1,l.y1,l.x2,l.y2)})}}
 function guidePage(doc,g){var pad=Math.max(10,Math.min(16,g.W*0.05)),n=g.cols*g.rows,small=g.W<230;doc.setTextColor(20,32,26);
@@ -911,15 +967,15 @@ function guidePage(doc,g){var pad=Math.max(10,Math.min(16,g.W*0.05)),n=g.cols*g.
   y+=8;doc.setFontSize(small?8.5:9.5);steps.forEach(function(s){var lines=doc.splitTextToSize(s,maxW);if(y+lines.length*4.6>g.H-pad)return;doc.text(lines,pad,y);y+=lines.length*(small?4.1:4.6)+2})}
 
 /* ---------- cutting and folding guide ---------- */
-function guideSteps(g){var n=g.cols*g.rows,cutTxt=[];
-  cuts(g).forEach(function(l,i){cutTxt.push('between strips '+(i+1)+' and '+(i+2)+', from the '+(i%2===0?'top edge down':'bottom edge up')+', stopping where the '+(i%2===0?'bottom':'top')+' row begins')});
-  var turns=[];for(var c=0;c<g.cols-1;c++)turns.push('strips '+(c+1)+' and '+(c+2)+' at the '+(c%2===0?'bottom':'top'));
+function guideSteps(g){var n=g.cols*g.rows,cutTxt=[],R=byRows(),nS=R?g.rows:g.cols,per=R?g.cols:g.rows;
+  cuts(g).forEach(function(l,i){cutTxt.push('between strips '+(i+1)+' and '+(i+2)+', from the '+(R?(i%2===0?'left edge across':'right edge across'):(i%2===0?'top edge down':'bottom edge up'))+', stopping where the '+(R?(i%2===0?'last':'first')+' column':(i%2===0?'bottom':'top')+' row')+' begins')});
+  var turns=[];for(var c=0;c<nS-1;c++)turns.push('strips '+(c+1)+' and '+(c+2)+' at the '+(R?(c%2===0?'right':'left')+' end':(c%2===0?'bottom':'top')));
   return [
     {t:'Print',b:(duplex()?'Print pages 1 and 2 of the PDF as one two-sided sheet, flipping on the '+(S.sheet.flip==='short'?'short':'long')+' edge, at 100% (Actual size), on double-sided '+sizeLabel()+' paper ('+fmt(g.W)+' × '+fmt(g.H)+' mm). Without automatic two-sided printing, print page 1, put the sheet back in the tray and print page 2; run a test sheet first to learn which way to reload it.':'Print the sheet at 100% (Actual size), single-sided, on '+sizeLabel()+' paper ('+fmt(g.W)+' × '+fmt(g.H)+' mm).')+' Turn off “Fit to page”. Try one copy on plain paper first; the test sheet option in Export PDF prints page numbers only.'},
-    {t:'Trim the margin',b:g.m>0?'Cut off the white paper margin, using the small corner marks as guides. You now have a block of '+g.cols+' strips × '+g.rows+' pages.':'There is no paper margin, so there is nothing to trim.'},
-    {t:'Fold the rows while the sheet is still whole',b:'Before cutting anything, fold along each of the '+(g.rows-1)+' horizontal lines right across the full width, using the ruler and a bone folder (or an empty ballpoint pen). Every strip folds the same way on a given line, so one fold does the whole sheet: the first line is a mountain (M, folds away from you, so page 1 stays on the outside as the cover), the next a valley (V, toward you), and so on, alternating. The blue ticks in the margin show where each line sits. Crease firmly, then open the sheet flat.'},
-    {t:'Crease the lines between strips',b:'Score each vertical line between strips and fold it back and forth once. Only the end that stays joined matters, where the strip turns into the next one: '+turns.join(', ')+'. Open the sheet flat again.'},
-    {t:'Cut the slits',b:'Now, with the sheet flat on a cutting mat, use a craft knife and a metal ruler to cut '+(g.cols-1)+' slit'+(g.cols>2?'s':'')+': '+cutTxt.join('; ')+'. Each slit stops one page short of the edge, so the sheet stays in one long zig-zag strip. The creases are already in, so nothing tears or shifts.'},
+    {t:'Trim the margin',b:g.m>0?'Cut off the white paper margin, using the small corner marks as guides. You now have a block of '+nS+' strips × '+per+' pages.':'There is no paper margin, so there is nothing to trim.'},
+    {t:'Fold the '+(R?'columns':'rows')+' while the sheet is still whole',b:'Before cutting anything, fold along each of the '+(per-1)+' '+(R?'vertical lines right down the full height':'horizontal lines right across the full width')+', using the ruler and a bone folder (or an empty ballpoint pen). Every strip folds the same way on a given line, so one fold does the whole sheet: the first line is a mountain (M, folds away from you, so page 1 stays on the outside as the cover), the next a valley (V, toward you), and so on, alternating. The blue ticks in the margin show where each line sits. Crease firmly, then open the sheet flat.'},
+    {t:'Crease the lines between strips',b:'Score each '+(R?'horizontal':'vertical')+' line between strips and fold it back and forth once. Only the end that stays joined matters, where the strip turns into the next one: '+turns.join(', ')+'. Open the sheet flat again.'},
+    {t:'Cut the slits',b:'Now, with the sheet flat on a cutting mat, use a craft knife and a metal ruler to cut '+(nS-1)+' slit'+(nS>2?'s':'')+': '+cutTxt.join('; ')+'. Each slit stops one page short of the edge, so the sheet stays in one long zig-zag strip. The creases are already in, so nothing tears or shifts.'},
     {t:'Refold strip by strip',b:'Start at page 1 and follow the reading order. The creases from step 3 make each strip collapse like an accordion; at each turn, fold across to the next strip and keep going.'},
     {t:'Press and check',b:'Stack everything with page 1 on top as the front cover and page '+n+' as the back cover. Press it flat under a heavy book for a few minutes, then flip through to check the order.'}]}
 function guideTools(){return ['Craft knife or sharp scissors','Metal ruler','Cutting mat','Bone folder (or an empty ballpoint pen)']}
@@ -953,7 +1009,7 @@ function tokLabel(t){return 'p.'+tokPage(t)+(t[0]==='B'?' back':'')}
 function renderPages(){var g=geo(),order=path(g),n=order.length,two=duplex(),fold=$('#vw-fold').checked&&!two,dpr=Math.min(2,window.devicePixelRatio||1),targetH=Math.min(1100,Math.max(320,window.innerHeight*0.72*dpr)),sc=targetH/g.ph,k;
   $('#vw-fold').closest('label').hidden=two;VW.imgs={};
   function rend(num,sd){var i=order[num-1],R=rectOf(i,g),c=document.createElement('canvas');c.width=Math.round(g.pw*sc);c.height=Math.round(g.ph*sc);var x=c.getContext('2d');
-    if(fold&&R.c%2===1){x.translate(c.width,c.height);x.rotate(Math.PI)}x.translate(-R.x*sc,-R.y*sc);var pp=sd==='B'?backArr()[i]:S.panels[i];drawPanel(x,pp,R,sc);
+    if(fold&&(byRows()?R.r:R.c)%2===1){x.translate(c.width,c.height);x.rotate(Math.PI)}x.translate(-R.x*sc,-R.y*sc);var pp=sd==='B'?backArr()[i]:S.panels[i];drawPanel(x,pp,R,sc);
     if(isEmpty(pp)){var cw=R.w*sc,ch=R.h*sc,big=Math.min(ch*0.42,cw*0.36);x.textAlign='center';x.textBaseline='middle';x.fillStyle='rgba(20,32,26,.16)';x.font='700 '+big+'px "Bricolage Grotesque", Arial, sans-serif';x.fillText(num+(sd==='B'?'b':''),R.x*sc+cw/2,R.y*sc+ch*0.5)}
     VW.imgs[sd+num]=c.toDataURL('image/jpeg',0.9)}
   for(k=1;k<=n;k++){rend(k,'F');if(two)rend(k,'B')}
@@ -962,11 +1018,12 @@ function renderPages(){var g=geo(),order=path(g),n=order.length,two=duplex(),fol
   else{for(k=1;k<n;k++)VW.spreads.push((k-1)%2===0?['B'+k,'B'+(k+1)]:['F'+k,'F'+(k+1)]);VW.spreads.push([(n-2)%2===0?'F'+n:'B'+n,null])}
   VW.singles=[];VW.spreads.forEach(function(s){s.forEach(function(t){if(t&&VW.singles.indexOf(t)<0)VW.singles.push(t)})})}
 function setSlot(el,t){el.innerHTML=t==null?'':'<img src="'+VW.imgs[t]+'" alt="'+tokLabel(t)+'">';el.classList.toggle('filled',t!=null)}
-function faceHtml(t,cls){return '<div class="face '+cls+'">'+(t==null?'':'<img src="'+VW.imgs[t]+'" alt="">')+'</div>'}
+function faceHtml(t,cls){return '<div class="face '+cls+'"'+(cls==='back'&&book.classList.contains('vert')?' style="transform:rotateX(180deg)"':'')+'>'+(t==null?'':'<img src="'+VW.imgs[t]+'" alt="">')+'</div>'}
 function vwMax(){return VW.mode==='spread'?VW.spreads.length-1:VW.singles.length-1}
-function vwLayout(){var g=geo(),a=g.pw/g.ph,cols=VW.mode==='spread'?2:1,aw=stage.clientWidth-12,ah=stage.clientHeight-12,pw=Math.max(60,Math.min(aw/cols,ah*a)),ph=pw/a;
-  VW.pw=pw;book.style.setProperty('--pw',pw+'px');book.style.setProperty('--ph',ph+'px');book.style.width=pw*cols+'px';book.style.height=ph+'px';
-  slotL.hidden=cols===1;slotL.style.left='0px';slotR.style.left=(cols===2?pw:0)+'px'}
+function vwLayout(){var g=geo(),a=g.pw/g.ph,two=VW.mode==='spread',vert=!byRows(),aw=stage.clientWidth-12,ah=stage.clientHeight-12,pw,ph;book.classList.toggle('vert',vert);
+  if(vert&&two){pw=Math.max(60,Math.min(aw,ah/2*a));ph=pw/a;book.style.width=pw+'px';book.style.height=2*ph+'px';slotL.style.left='0px';slotL.style.top='0px';slotR.style.left='0px';slotR.style.top=ph+'px'}
+  else{var cols=two?2:1;pw=Math.max(60,Math.min(aw/cols,ah*a));ph=pw/a;book.style.width=pw*cols+'px';book.style.height=ph+'px';slotL.style.left='0px';slotL.style.top='0px';slotR.style.left=(cols===2?pw:0)+'px';slotR.style.top='0px'}
+  VW.pw=pw;VW.ph=ph;book.style.setProperty('--pw',pw+'px');book.style.setProperty('--ph',ph+'px');slotL.hidden=!two}
 function vwShow(){var label,first=VW.idx===0,last=VW.idx===vwMax(),of=duplex()?' · '+S.panels.length+' pages, both sides':' of '+S.panels.length;
   if(VW.mode==='spread'){var s=VW.spreads[VW.idx];setSlot(slotL,s[0]);setSlot(slotR,s[1]);label=s.filter(function(v){return v!=null}).map(tokLabel).join(' | ')}
   else{var t=VW.singles[VW.idx];setSlot(slotR,t);label=tokLabel(t)}
@@ -974,12 +1031,13 @@ function vwShow(){var label,first=VW.idx===0,last=VW.idx===vwMax(),of=duplex()?'
   $('#vw-count').textContent=label;$('#vw-prev').disabled=VW.idx<=0;$('#vw-next').disabled=VW.idx>=vwMax()}
 function vwFlip(dir){if(VW.busy)return;var next=VW.idx+dir;if(next<0||next>vwMax())return;
   if(reduceMotion||!Element.prototype.animate){VW.idx=next;vwShow();return}
-  VW.busy=true;var leaf=document.createElement('div'),frontK,backK,from=0,to,left=0,origin='left center';leaf.className='leaf';
+  VW.busy=true;var vert=book.classList.contains('vert'),ax=vert?'rotateX':'rotateY',leaf=document.createElement('div'),frontK,backK,from=0,to,left=0,top=0,origin=vert?'center top':'left center';leaf.className='leaf';
   if(VW.mode==='spread'){var cur=VW.spreads[VW.idx],nx=VW.spreads[next];
-    if(dir>0){frontK=cur[1];backK=nx[0];setSlot(slotR,nx[1]);left=VW.pw;to=-180}else{frontK=cur[0];backK=nx[1];setSlot(slotL,nx[0]);origin='right center';to=180}}
-  else{backK=null;if(dir>0){frontK=VW.singles[VW.idx];setSlot(slotR,VW.singles[next]);to=-180}else{frontK=VW.singles[next];from=-180;to=0}}
-  leaf.style.left=left+'px';leaf.style.transformOrigin=origin;leaf.innerHTML=faceHtml(frontK,'front')+faceHtml(backK,'back');book.appendChild(leaf);
-  var anim=leaf.animate([{transform:'rotateY('+from+'deg)'},{transform:'rotateY('+to+'deg)'}],{duration:720,easing:'cubic-bezier(.35,.05,.25,1)',fill:'forwards'});
+    if(dir>0){frontK=cur[1];backK=nx[0];setSlot(slotR,nx[1]);if(vert){top=VW.ph;to=180}else{left=VW.pw;to=-180}}
+    else{frontK=cur[0];backK=nx[1];setSlot(slotL,nx[0]);if(vert){origin='center bottom';to=-180}else{origin='right center';to=180}}}
+  else{backK=null;var out=vert?180:-180;if(dir>0){frontK=VW.singles[VW.idx];setSlot(slotR,VW.singles[next]);to=out}else{frontK=VW.singles[next];from=out;to=0}}
+  leaf.style.left=left+'px';leaf.style.top=top+'px';leaf.style.transformOrigin=origin;leaf.innerHTML=faceHtml(frontK,'front')+faceHtml(backK,'back');book.appendChild(leaf);
+  var anim=leaf.animate([{transform:ax+'('+from+'deg)'},{transform:ax+'('+to+'deg)'}],{duration:720,easing:'cubic-bezier(.35,.05,.25,1)',fill:'forwards'});
   anim.onfinish=function(){VW.idx=next;vwShow();leaf.remove();VW.busy=false}}
 function vwOpen(){ensureFonts().then(decodeAll).then(function(){renderPages();VW.mode=window.innerWidth<700?'single':'spread';$('#vm-s').checked=VW.mode==='spread';$('#vm-1').checked=VW.mode==='single';
   VW.idx=0;VW.busy=false;$('#viewer').hidden=false;vwLayout();vwShow();$('#vw-next').focus()})}
@@ -992,8 +1050,70 @@ $('#vw-fold').addEventListener('change',function(){renderPages();vwShow()});
 var sw=null;stage.addEventListener('pointerdown',function(e){sw={x:e.clientX,y:e.clientY}});
 stage.addEventListener('pointerup',function(e){if(!sw)return;var dx=e.clientX-sw.x,dy=e.clientY-sw.y;sw=null;
   if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){vwFlip(dx<0?1:-1);return}
+  if(book.classList.contains('vert')&&Math.abs(dy)>40&&Math.abs(dy)>Math.abs(dx)){vwFlip(dy<0?1:-1);return}
   if(Math.abs(dx)<8&&Math.abs(dy)<8){var r=stage.getBoundingClientRect();vwFlip(e.clientX>r.left+r.width/2?1:-1)}});
 window.addEventListener('resize',function(){if(!$('#viewer').hidden)vwLayout()});
+
+/* ---------- captions and word pages (Claude, via the sample capability) ---------- */
+var AI=null,AIimgMax=0,aiCtl=null;
+if(window.claude&&typeof window.claude.use==='function'){window.claude.use('sample').then(function(s){AI=s||null;return s&&s.limits?s.limits().catch(function(){return null}):null})
+  .then(function(l){AIimgMax=l&&l.images?Math.max(1,Math.min(8,l.images.maxCount||1)):0;var ok=!!(AI&&AIimgMax);$('#aiBtn').hidden=!ok;$('#aiPageBtn').hidden=!ok}).catch(function(){})}
+var TONES={short:{d:'very short and plain, 2 to 5 words',w:5},descriptive:{d:'one plain descriptive sentence',w:14},poetic:{d:'short and evocative, like a line of a poem',w:10},documentary:{d:'documentary style, naming the subject and the moment, using the place and date from the context when given',w:14}};
+(function(){try{var c=localStorage.getItem('zl-ai');if(c){c=JSON.parse(c);if(c.lang)$('#ai-lang').value=c.lang;if(c.tone)$('#ai-tone').value=c.tone;if(c.ctx)$('#ai-context').value=c.ctx}}catch(_){}})();
+function aiPrefs(){var o={lang:$('#ai-lang').value,tone:$('#ai-tone').value,ctx:$('#ai-context').value.trim()};try{localStorage.setItem('zl-ai',JSON.stringify(o))}catch(_){}return o}
+function photoBlob(id){var im=IMG.get(id);if(!im)return Promise.resolve(null);return (im.decode?im.decode().catch(function(){}):Promise.resolve()).then(function(){var w=im.naturalWidth,h=im.naturalHeight;if(!w)return null;var k=Math.min(1,1024/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);return new Promise(function(res){c.toBlob(function(b){res(b)},'image/jpeg',0.85)})})}
+function aiErr(e){var c=e&&e.code;if(c==='cancelled')return 'Stopped.';if(c==='not_granted'||c==='sampling_disabled')return 'Claude is not allowed for this page, so captions are unavailable here.';
+  if(c==='rate_limited')return 'Too many requests right now, or your usage limit was reached. Try again in a while.';if(c==='image_rejected')return 'One of the photos could not be sent. Try fewer photos at a time.';
+  if(c==='invalid_json'||c==='empty_completion')return 'The answer came back in the wrong shape. Press the button again.';if(c==='refused')return 'Claude declined to describe these photos.';return 'Something went wrong talking to Claude. Try again.'}
+function aiBusy(on,msg){$('#ai-cap').disabled=on;$('#ai-words').disabled=on;$('#ai-stop').hidden=!on;if(msg!=null)$('#ai-msg').textContent=msg}
+function openAI(scope){var two=duplex();$('#as-both').hidden=!two;$('#as-both-l').hidden=!two;$('#as-side-l').textContent=two?(side==='back'?'All on the back':'All on the front'):'All photo pages';
+  if(scope)$('#as-'+scope).checked=true;if(!two&&$('#as-both').checked)$('#as-side').checked=true;$('#ai-msg').textContent='';$('#ai').hidden=false;$('#ai-close').focus()}
+function closeAI(){if(aiCtl)aiCtl.abort();$('#ai').hidden=true}
+$('#aiBtn').addEventListener('click',function(){openAI(null)});$('#aiPageBtn').addEventListener('click',function(){openAI('page')});
+$('#ai-close').addEventListener('click',closeAI);$('#ai').addEventListener('click',function(e){if(e.target.id==='ai')closeAI()});$('#ai-stop').addEventListener('click',function(){if(aiCtl)aiCtl.abort()});
+function capTargets(scope,keep){var g=geo(),out=[];
+  if(scope==='page'){var p=A()[selected];if(p&&p.photo&&images[p.photo])out.push({sd:duplex()?side:'front',i:selected,id:p.photo});return out}
+  var sides=scope==='both'&&duplex()?['front','back']:[duplex()?side:'front'];
+  sides.forEach(function(sd){var a=sd==='back'?backArr():S.panels;path(g).forEach(function(i){var p=a[i];if(p.photo&&images[p.photo]&&!(keep&&String(p.text||'').trim()))out.push({sd:sd,i:i,id:p.photo})})});return out}
+$('#ai-cap').addEventListener('click',function(){if(!AI)return;var pr=aiPrefs(),scope=($('input[name=aiscope]:checked')||{}).value||'side',keep=$('#ai-keep').checked&&scope!=='page',T=capTargets(scope,keep);
+  if(!T.length){$('#ai-msg').textContent=scope==='page'?'This page has no photo. Select a page with a photo first.':'No photo pages to caption'+(keep?' (pages with text are skipped)':'')+'.';return}
+  var tone=TONES[pr.tone]||TONES.short,batches=[],B=AIimgMax,done=0,nums=pageNumbers(geo());for(var k=0;k<T.length;k+=B)batches.push(T.slice(k,k+B));
+  aiCtl=new AbortController();var sig=aiCtl.signal;aiBusy(true,'Thinking… the first answer can take up to a minute.');
+  batches.reduce(function(chain,batch){return chain.then(function(){if(sig.aborted)throw {code:'cancelled'};
+      return Promise.all(batch.map(function(t){return photoBlob(t.id)})).then(function(blobs){var n=batch.length,names=batch.map(function(t,j){return (j+1)+'. '+(images[t.id].name||'photo')}).join('; ');
+        var prompt='You are writing captions for photos in a small printed photo zine.\nLanguage: '+pr.lang+'.\nStyle: '+tone.d+', at most '+tone.w+' words.\n'+(pr.ctx?'What the photographer says about these photos: '+pr.ctx+'\n':'')+
+          'There are '+n+' photos attached, in this order: '+names+'.\nWrite one caption per photo. Describe what is visible; do not invent names of people or exact places that are not in the context. No hashtags, no emoji, no quotation marks.\n'+
+          'Reply with only a JSON array of '+n+' strings, in the same order as the photos. Example: ["Morning road, still empty","Two horses cross"]';
+        return AI.json(prompt,{images:blobs.filter(Boolean),signal:sig,modelTier:'default'})}).then(function(arr){if(!Array.isArray(arr))throw {code:'invalid_json'};
+        batch.forEach(function(t,j){var cap=String(arr[j]==null?'':arr[j]).replace(/^["“]|["”]$/g,'').trim();if(!cap)return;var a=t.sd==='back'?backArr():S.panels,p=a[t.i];
+          Object.assign(p,{text:cap,font:'mono',size:7,color:'#ffffff',shadow:true,valign:'bottom',align:'left',rot:p.rot||0});done++});
+        renderAll();$('#ai-msg').textContent='Captioned '+done+' of '+T.length+'…'})})},Promise.resolve())
+  .then(function(){commit();renderAll();aiBusy(false,'Wrote '+done+' caption'+(done===1?'':'s')+(scope==='page'?' for page '+nums[T[0].i]:'')+'. Undo removes them all.')})
+  .catch(function(e){if(done)commit();renderAll();aiBusy(false,(done?'Wrote '+done+' caption'+(done===1?'':'s')+' before stopping. ':'')+aiErr(e))})});
+var aiSugg=[];
+function hexOK(h){return /^#[0-9a-f]{6}$/i.test(String(h||''))}
+function renderSugg(){$('#ai-sugg').innerHTML=aiSugg.length?aiSugg.map(function(s,i){return '<div class="ai-item'+(s.added?' added':'')+'"><div class="sw-prev" style="background:'+s.bg+';color:'+s.color+'">'+esc(s.text)+'</div><div class="t">'+esc(s.text)+'</div><button class="btn small" type="button" data-add="'+i+'"'+(s.added?' disabled':'')+'>'+(s.added?'Added':'Add page')+'</button></div>'}).join('')+
+  '<div class="btnrow"><button class="btn small primary" type="button" id="ai-addall">Add all</button><button class="btn small" type="button" id="ai-again">Suggest again</button></div>':''}
+function nextEmpty(){var g=geo(),sides=duplex()?[side,side==='back'?'front':'back']:['front'],hit=null;sides.some(function(sd){var a=sd==='back'?backArr():S.panels;return path(g).some(function(i){if(isEmpty(a[i])){hit={sd:sd,i:i,a:a};return true}})});return hit}
+function addSugg(i){var s=aiSugg[i];if(!s||s.added)return false;var t=nextEmpty();if(!t){$('#ai-msg').textContent='No empty pages left. Add rows, clear a page, or pick a bigger layout first.';return false}
+  var short=s.text.length<=14;Object.assign(t.a[t.i],{bg:s.bg,color:s.color,text:s.text,font:short?'anton':'serif',size:short?26:14,align:'center',valign:'middle',shadow:false,pattern:'none',photo:null});s.added={page:pageNumbers(geo())[t.i],sd:t.sd};return true}
+function suggestWords(fresh){if(!AI)return;var pr=aiPrefs(),n=Math.max(1,Math.min(8,Math.round(+$('#ai-n').value||4))),g=geo(),ids=[];
+  bothSides(function(a){path(g).forEach(function(i){if(a[i].photo&&images[a[i].photo]&&ids.indexOf(a[i].photo)<0)ids.push(a[i].photo)})});Object.keys(images).forEach(function(id){if(ids.indexOf(id)<0)ids.push(id)});
+  if(!ids.length){$('#ai-msg').textContent='Add some photos first, so Claude has something to look at.';return}
+  var pick=[],B=AIimgMax;for(var k=0;k<Math.min(B,ids.length);k++)pick.push(ids[Math.floor(k*ids.length/Math.min(B,ids.length))]);
+  aiCtl=new AbortController();aiBusy(true,'Thinking… the first answer can take up to a minute.');
+  Promise.all(pick.map(photoBlob)).then(function(blobs){var tone=TONES[pr.tone]||TONES.short;
+    var prompt='You are designing a small printed photo zine. Attached are '+pick.length+' of its photos.\nLanguage: '+pr.lang+'.\nTone: '+tone.d+'.\n'+(pr.ctx?'What the photographer says about these photos: '+pr.ctx+'\n':'')+
+      'Suggest '+n+' texts for pages that sit between the photos: single words or short phrases of at most 6 words that echo what the photos show or how they feel. Make them varied. No hashtags, emoji or quotation marks.\n'+
+      'For each, choose a background color taken from the photos\' palette and a text color that reads clearly on it.\nReply with only a JSON array of objects like {"text":"Crater rim","bg":"#2f6b4f","color":"#fcefd2"}.';
+    var opt={images:blobs.filter(Boolean),signal:aiCtl.signal,modelTier:'default'};if(fresh)opt.cache=false;return AI.json(prompt,opt)})
+  .then(function(arr){if(!Array.isArray(arr))throw {code:'invalid_json'};aiSugg=arr.map(function(o){o=o||{};return {text:String(o.text||'').replace(/^["“]|["”]$/g,'').trim().slice(0,80),bg:hexOK(o.bg)?o.bg:'#111111',color:hexOK(o.color)?o.color:'#ffffff'}}).filter(function(o){return o.text}).slice(0,n);
+    renderSugg();aiBusy(false,aiSugg.length?'Pick the ones you like. Each goes on the next empty page'+(duplex()?' of this side, then the other':'')+'.':'No suggestions came back. Try again.')})
+  .catch(function(e){aiBusy(false,aiErr(e))})}
+$('#ai-words').addEventListener('click',function(){suggestWords(false)});
+$('#ai-sugg').addEventListener('click',function(e){var b=e.target.closest('[data-add]');if(b){if(addSugg(+b.dataset.add)){commit();renderAll();renderSugg();var s=aiSugg[+b.dataset.add];$('#ai-msg').textContent='Added “'+s.text+'” on page '+s.added.page+(s.added.sd==='back'?' (back)':'')+'.'}return}
+  if(e.target.id==='ai-addall'){var n=0;aiSugg.forEach(function(s,i){if(!s.added&&addSugg(i))n++});if(n){commit();renderAll()}renderSugg();if(n)$('#ai-msg').textContent='Added '+n+' word page'+(n===1?'':'s')+'.'}
+  if(e.target.id==='ai-again')suggestWords(true)});
 
 /* ---------- start page ---------- */
 function showEditor(){document.body.classList.add('editor-on');window.scrollTo(0,0);requestAnimationFrame(function(){draw()})}
@@ -1005,7 +1125,7 @@ function refreshLanding(){var has=hasWork();$('#ld-continue').hidden=!has;
   cloudReady.then(function(){var ok=cloudOK();$('#ld-projects').hidden=!ok;$('#ld-open-note').textContent=ok?'Open a zine you saved to your projects, or a project file you downloaded.':'Open a project file you downloaded earlier.'})}
 $('#ld-new').addEventListener('click',function(e){var b=e.currentTarget;
   if(hasWork()&&!current.id&&b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Start anyway';$('#ld-msg').textContent='Your current draft is not saved to your projects. Starting a new zine replaces it.';return}
-  var lay=($('input[name=ld-layout]:checked')||{value:'3x6'}).value.split('x'),sheet=Object.assign(defSheet(),{size:$('#ld-size').value,cols:+lay[0],rows:+lay[1],duplex:$('#ld-duplex').checked});
+  var lay=($('input[name=ld-layout]:checked')||{value:'3x6'}).value.split('x'),sheet=Object.assign(defSheet(),{size:$('#ld-size').value,cols:+lay[0],rows:+lay[1],duplex:$('#ld-duplex').checked,dir:($('input[name=ld-dir]:checked')||{value:'rows'}).value});
   loadProject({sheet:sheet,panels:[],images:{}},{id:null,name:''});showEditor();toast('New '+(+lay[0]*+lay[1])+'-page zine on '+sizeLabel()+'. Add photos to start.')});
 $('#ld-cont').addEventListener('click',showEditor);
 $('#ld-projects').addEventListener('click',function(){cloudReady.then(openProj)});
