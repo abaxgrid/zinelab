@@ -341,8 +341,11 @@ body.editor-on .landing{display:none}
         <div class="tray" id="tray" aria-label="Photo tray"></div>
         <label class="check"><input type="checkbox" id="autoPlace" checked>Place new photos on empty pages automatically</label>
         <p class="hint" id="trayHint">Drag a photo onto a page. On a phone, tap a photo, then tap a page.</p>
+        <div class="row" id="placeScope" hidden>Auto-place on
+          <div class="seg" role="radiogroup" aria-label="Auto-place on"><input type="radio" name="pscope" id="ps-f" value="front"><label for="ps-f">Front</label><input type="radio" name="pscope" id="ps-b" value="back"><label for="ps-b">Back</label><input type="radio" name="pscope" id="ps-both" value="both" checked><label for="ps-both">Both</label></div>
+        </div>
         <div class="btnrow">
-          <button class="btn small" id="fillEmpty" type="button">Fill empty pages in order</button>
+          <button class="btn small primary" id="fillEmpty" type="button">Auto-place photos</button>
           <button class="btn small" id="clearAll" type="button">Clear all pages</button>
         </div>
       </section>
@@ -631,7 +634,7 @@ function draw(){var g=geo(),wrap=$('#sheetwrap'),aw=Math.max(200,wrap.clientWidt
   var bw=Math.round(Math.floor(g.W*sc)*dpr),bh=Math.round(Math.floor(g.H*sc)*dpr);if(cv.width!==bw)cv.width=bw;if(cv.height!==bh)cv.height=bh;
   var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,bw,bh);drawSheet(ctx,sc,{preview:true,side:duplex()?side:'front'});updInfo()}
 function updInfo(){var g=geo(),n=g.cols*g.rows;$('#info').textContent=sizeLabel()+' · '+fmt(g.W)+' × '+fmt(g.H)+' mm · '+g.cols+' × '+g.rows+' = '+(duplex()?n+' pages × 2 sides':n+' pages')+' · page '+fmt(g.pw)+' × '+fmt(g.ph)+' mm'+(duplex()?' · showing the '+(side==='back'?'BACK':'front')+' side as printed':'');
-  $('#sideSwitch').hidden=!duplex();$('#sd-f').checked=side!=='back';$('#sd-b').checked=side==='back'}
+  $('#sideSwitch').hidden=!duplex();$('#placeScope').hidden=!duplex();$('#sd-f').checked=side!=='back';$('#sd-b').checked=side==='back'}
 
 /* ---------- history and saving ---------- */
 var hist=[],hi=-1,saveTimer=null;
@@ -744,9 +747,16 @@ var tray=$('#tray');
 tray.addEventListener('click',function(e){var d=e.target.closest('[data-del]');if(d){var id=d.dataset.del;bothSides(function(a){a.forEach(function(p){if(p.photo===id)p.photo=null})});delete images[id];IMG.delete(id);if(armed===id)armed=null;commit();renderAll();scheduleSave();return}
   var t=e.target.closest('.thumb');if(!t)return;armed=armed===t.dataset.id?null:t.dataset.id;renderTray()});
 tray.addEventListener('dragstart',function(e){var t=e.target.closest('.thumb');if(!t)return;e.dataTransfer.setData('text/plain','zine-photo:'+t.dataset.id);e.dataTransfer.effectAllowed='copy'});
-$('#fillEmpty').addEventListener('click',function(){var g=geo(),u=usedPages(),pool=Object.keys(images).filter(function(id){return !u[id]}),n=0;
-  if(!pool.length){toast('Every photo in the tray is already on the sheet.');return}
-  path(g).forEach(function(i){if(pool.length&&isEmpty(A()[i])){A()[i].photo=pool.shift();n++}});commit();renderAll();toast(n?'Placed '+n+' photo'+(n===1?'':'s')+' in page order.':'No empty pages left. Clear a page first.')});
+/* Auto-place: photos not yet on any page, sorted by file name, fill empty pages in reading order.
+   Two-sided: Front, Back, or Both (front pages first, then back pages). */
+$('#fillEmpty').addEventListener('click',function(){var g=geo(),u=usedPages(),nums=pageNumbers(g),
+    pool=Object.keys(images).filter(function(id){return !u[id]}).sort(function(a,b){return String(images[a].name).localeCompare(String(images[b].name),undefined,{numeric:true,sensitivity:'base'})}),
+    scope=duplex()?(($('input[name=pscope]:checked')||{}).value||'both'):'front',sides=scope==='both'?['front','back']:[scope],placed={front:0,back:0};
+  if(!pool.length){toast(Object.keys(images).length?'Every photo in the tray is already on a page. Add more photos first.':'Add photos first, then auto-place them.');return}
+  sides.forEach(function(sd){var a=sd==='back'?backArr():S.panels;path(g).forEach(function(i){if(pool.length&&isEmpty(a[i])){a[i].photo=pool.shift();placed[sd]++}})});
+  var n=placed.front+placed.back;if(!n){toast('No empty pages left'+(duplex()?' on '+(scope==='both'?'either side':'the '+scope):'')+'. Clear a page first.');return}
+  commit();renderAll();var parts=[];if(placed.front)parts.push(placed.front+(duplex()?' on the front':''));if(placed.back)parts.push(placed.back+' on the back');
+  toast('Placed '+n+' photo'+(n===1?'':'s')+(duplex()?': '+parts.join(', '):' in page order')+(pool.length?'. '+pool.length+' left in the tray.':'.'))});
 $('#clearAll').addEventListener('click',function(){if(duplex()&&side==='back')S.back=S.panels.map(blankPanel);else S.panels=S.panels.map(blankPanel);commit();renderAll();toast('All pages cleared. Undo brings them back.')});
 
 /* ---------- events: canvas ---------- */
